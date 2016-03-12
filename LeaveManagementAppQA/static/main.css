@@ -1,0 +1,218 @@
+@import url(https://fonts.googleapis.com/css?family=Titillium+Web);
+@import url(https://fonts.googleapis.com/css?family=Lato:700);
+
+
+.navbar .navbar-nav {
+    display: inline-block;
+    float: none;
+}
+
+.navbar .navbar-collapse {
+    text-align: center;
+}
+
+body {
+        background-color: rgb(59, 83, 152);;
+        font-family: 'Titillium Web', sans-serif;
+        padding-top: 80px
+     }
+
+.navbar-brand,
+.navbar-nav li a {
+    line-height: 75px;
+    height: 80px;
+    padding-top: 5px;
+    float: none;
+    display: inline-block;
+}
+
+.navbar-brand{
+    max-width: 100px;
+}
+
+.navbar-brand{
+    position: absolute;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    margin: auto;
+}
+
+#login_content {
+    color: white;
+    font-family: 'Titillium Web', sans-serif;
+}
+#dashboard_name{
+    color: white;
+}
+.navbar-fixed-bottom p {
+    line-height: 12px;
+    height: 12px;
+    padding-top: 9px;
+}
+#container_padding {
+    padding-top: 4px;
+    padding-right: 6px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+}
+#dashboard_container_one {
+    border-style: none;
+    background-color: rgb(255, 153, 0);
+    color: white;
+}
+
+#dashboard_container_two  {
+    border-style: none;
+    background-color: rgb(127, 140, 141);
+    color: white;
+}
+
+#calendar_container_two, #dashboard_container_calendar {
+    border-style: none;
+    background-color: rgb(255, 0, 102);
+    color: white;
+}
+.progress-bar[aria-valuenow="0"] {
+  color: black;
+  min-width: 0%;
+  background: "transparent";
+  box-shadow: none;
+}
+h1,h2{
+    font-family: 'Titillium Web','sans-serif';
+}
+
+.number-container{
+
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 100px;
+
+}
+.navbar-right{
+    float:right;
+}
+
+.form-control {
+    box-shadow: 0 1px 3px #999 inset;
+    border: 0;
+    line-height: 28px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+}
+.inner-div{
+   padding: 5px;
+ }
+
+.fc-today {
+     background-color: rgb(255, 84, 149) !important;
+     border-style: solid;
+     border-color: 'white';
+ }
+
+ #nav_logo {
+     padding-top: 4px;
+     padding-left: 2px;
+ }
+
+#footer {
+  width: 100%;
+  background-color: #f5f5f5;
+  height: 60px;
+  padding-top: 20px;
+}
+#footer_login {
+   position:fixed;
+   left:0px;
+   bottom:0px;
+   height:30px;
+   width:100%;
+}
+#push {
+  height: 60px;
+}
+
+.text-muted{
+    padding-top: 20px 0;
+}
+
+#page {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    /* Negative indent footer by it's height */
+    margin: 0 auto -60px;
+}
+
+.modal{
+    position: absolute;
+}
+
+td{
+  text-align: center
+}
+
+
+
+@media (max-width: 767px) {
+#footer, #calendar_container_two {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+    }
+}
+
+.button-padding{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}
+.button-padding-table{
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+}
+
+@media (max-width: 480px) {
+
+body, #footer, #calendar_container_two, {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+    }
+}
+
+html, body {
+
+  height: 100%;
+}
+
+hr {
+    height: 2px;
+    background-color:rgb(255, 0, 102);;
+    color:rgb(255, 0, 102);;
+    border: 0 none;
+    width: 80%;
+}
+@media (min-width: 768px) {
+    .navbar .navbar-nav {
+        display: inline-block;
+        float: none;
+        vertical-align: top;
+    }
+
+    .navbar .navbar-collapse {
+        max-width: 80%;
+    }
+    .navbar-brand {
+        text-align: center;
+    }
+}
+
+

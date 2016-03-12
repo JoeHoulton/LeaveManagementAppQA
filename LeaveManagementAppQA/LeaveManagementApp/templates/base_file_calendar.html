@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>{% block title %}{% endblock %}</title>
+
+    {% load static %}
+    <script src="{% get_static_prefix %}/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}/main.css" />
+
+    {% block head_elements %} {% endblock %}
+
+</head>
+<nav class="navbar navbar-default ">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/calendar">
+             {% load static %}
+            <img src="{% get_static_prefix %}/Logo_Designs_3_Nav_Bar.png" alt="LeaveCal Logo"/>
+          </a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="/dashboard">Dashboard<span class="sr-only"></span></a></li>
+            <li class="active"><a href="/calendar">Calendar<span class="sr-only">(current)</span></a></li>
+            <li><a href="/userrequests">Your Requests<span class="sr-only"></span></a></li>
+            <li><a href="/leaverequests">Approve Leave<span class="sr-only"></span></a></li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                 <li><a href="/account/profile">Profile</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/account/logout">Logout</a></li></ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+    </div>
+</nav>
+<body>
+    {% block content %}
+
+    {% endblock %}
+</body>
+<footer>
+        <div class="navbar  navbar-default nav navbar-fixed-bottom">
+            <div class="container">
+                <p align="center">LeaveCal | Copyright 2015</p>
+            </div>
+        </div>
+        {% block scripts %}{% endblock %}
+</footer>

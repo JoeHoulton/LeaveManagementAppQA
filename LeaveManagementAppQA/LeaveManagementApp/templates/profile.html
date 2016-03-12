@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+{% extends "base_file.html" %}
+{% block title %}LeaveCal - Profile{% endblock %}
+{% block content %}
+        <div class="row">
+            <div class="col-md-12">
+                <h1 id="login_content" name="profile_title" align="center">PROFILE</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-xs-10 col-md-offset-1 col-xs-offset-1 panel panel-default" id="dasbboard_container_one">
+                <h2 align="center">Personal Information</h2>
+                <div class="panel-group">
+                    <h4>First Name</h4>
+                    <div class="progress">
+                        {{ first_name }}
+                    </div>
+                    <h4>Last Name</h4>
+                    <div class="progress">
+                        {{ last_name }}
+                    </div>
+                    <h4>Username</h4>
+                    <div class="progress">
+                        {{ username }}
+                    </div>
+                    <h4>Email</h4>
+                    <div class="progress">
+                        {{ email }}
+                    </div>
+                    <h4>Addresses</h4>
+                    <div class="tabbable">
+                        <ul class="nav nav-tabs" id="address_tabs">
+                        </ul>
+                        <div class="tab-content" id="address_fields">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xs-10 col-md-offset-2 col-xs-offset-1 panel panel-default" id="dasbboard_container_one">
+                <h2 align="center">Leave Information</h2>
+                <div class="panel-group">
+                    <h4>Leave Entitlement</h4>
+                    <h3 align="center" id="leave_entitlement"></h3>
+                    <h4>Used</h4>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped"  id="leave_used" role="progressbar"
+                          aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" style="width:0%">
+                        </div>
+                    </div>
+                    <h4>Remaining</h4>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped" id="leave_remaining" role="progressbar"
+                          aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" style="width:0%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-1">
+            </div>
+        </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $.ajax({
+                type: "GET",
+                url: "/account/addresses/",
+                success: function(data){
+                    $.each(JSON.parse(data), function(i, event_detail){
+
+                        //ADDRESS HTML CREATION USING DOM
+
+                        var current_address = document.createElement("LI");
+
+                        var is_active_tab_first = "active";
+
+                        if(i == 0){
+                            is_active_tab_first = "";
+                            var att = document.createAttribute("class");
+                            att.value = "active";
+                            current_address.setAttributeNode(att);
+                        }
+
+                        var link = document.createElement("A");
+                        var href = document.createAttribute("href");
+                        href.value = ("#" + "address" + i);
+                        var data_toggle = document.createAttribute("data-toggle");
+                        data_toggle.value = ("tab");
+
+                        link.setAttributeNode(href);
+                        link.setAttributeNode(data_toggle);
+                        link.innerHTML = event_detail["address_name"];
+
+                        current_address.appendChild(link);
+
+                        document.getElementById("address_tabs").appendChild(current_address);
+
+                        var is_active_tab_second = " active";
+
+                        if(i != 0){
+                            is_active_tab_second = "";
+                        }
+
+                        var div = document.createElement('div');
+                        var class_att = document.createAttribute("class");
+                        class_att.value = ("tab-pane" + is_active_tab_second);
+                        var att_id = document.createAttribute("id");
+                        att_id.value = ("address" + i)
+
+                        div.setAttributeNode(class_att);
+                        div.setAttributeNode(att_id);
+
+
+                        var current_address_form = document.createElement("form");
+
+                        var house_name_div = document.createElement("div");
+                        house_name_div.setAttribute("class", "form-group");
+
+                        var house_name_label = document.createElement("LABEL");
+                        house_name_label.innerHTML = "House Name/Number";
+
+                        var house_name = document.createElement("input");
+                        house_name.setAttribute('type',"text");
+                        house_name.setAttribute('value',event_detail["house_name"]);
+                        house_name.setAttribute('class', "form-control");
+
+                        house_name_div.appendChild(house_name_label);
+                        house_name_div.appendChild(house_name);
+
+                        var address_1_div = document.createElement("div");
+                        address_1_div.setAttribute("class", "form-group");
+
+                        var address_1_label = document.createElement("LABEL");
+                        address_1_label.innerHTML = "Address 1";
+
+                        var address_1 = document.createElement("input");
+                        address_1.setAttribute('type',"text");
+                        address_1.setAttribute('value',event_detail["address_1"]);
+                        address_1.setAttribute('class', "form-control");
+
+                        address_1_div.appendChild(address_1_label);
+                        address_1_div.appendChild(address_1);
+
+                        var address_2_div = document.createElement("div");
+                        address_2_div.setAttribute("class", "form-group");
+
+                        var address_2_label = document.createElement("LABEL");
+                        address_2_label.innerHTML = "Address 2";
+
+                        var address_2 = document.createElement("input");
+                        address_2.setAttribute('type',"text");
+                        address_2.setAttribute('value',event_detail["address_2"]);
+                        address_2.setAttribute('class', "form-control");
+
+                        address_2_div.appendChild(address_2_label);
+                        address_2_div.appendChild(address_2);
+
+                        var city_div = document.createElement("div");
+                        city_div.setAttribute("class", "form-group");
+
+                        var city_label = document.createElement("LABEL");
+                        city_label.innerHTML = "City";
+
+                        var city = document.createElement("input");
+                        city.setAttribute('type',"text");
+                        city.setAttribute('value',event_detail["city"]);
+                        city.setAttribute('class', "form-control");
+
+                        city_div.appendChild(city_label);
+                        city_div.appendChild(city);
+
+                        var county_div = document.createElement("div");
+                        county_div.setAttribute("class", "form-group");
+
+                        var county_label = document.createElement("LABEL");
+                        county_label.innerHTML = "County";
+
+                        var county = document.createElement("input");
+                        county.setAttribute('type',"text");
+                        county.setAttribute('value',event_detail["county"]);
+                        county.setAttribute('class', "form-control");
+
+                        county_div.appendChild(county_label);
+                        county_div.appendChild(county);
+
+                        var postcode_div = document.createElement("div");
+                        postcode_div.setAttribute("class", "form-group");
+
+                        var postcode_label = document.createElement("LABEL");
+                        postcode_label.innerHTML = "Postcode";
+
+                        var postcode = document.createElement("input");
+                        postcode.setAttribute('type',"text");
+                        postcode.setAttribute('value',event_detail["postcode"]);
+                        postcode.setAttribute('class', "form-control");
+
+                        postcode_div.appendChild(postcode_label);
+                        postcode_div.appendChild(postcode);
+
+                        current_address_form.appendChild(house_name_div);
+                        current_address_form.appendChild(address_1_div);
+                        current_address_form.appendChild(address_2_div);
+                        current_address_form.appendChild(city_div);
+                        current_address_form.appendChild(county_div);
+                        current_address_form.appendChild(postcode_div);
+
+                        div.appendChild(current_address_form);
+
+                        document.getElementById("address_fields").appendChild(div);
+
+                    });
+            }
+        });
+    });
+    $(document).ready(function() {
+        $.ajax({
+                type: "GET",
+                url: "/account/leavedetails/",
+                success: function(data){
+                    $.each(JSON.parse(data), function(i, event_detail){
+
+                        var leave_entitlement = event_detail["leave_entitlement"];
+                        var leave_remaining = event_detail["leave_remaining"];
+
+                        var leave_remaining_object = document.getElementById("leave_remaining");
+                        var leave_used_object = document.getElementById("leave_used");
+                        var leave_entitlement_object = document.getElementById("leave_entitlement");
+
+                        var percentage_remaining = ((leave_remaining/leave_entitlement)*100);
+                        var number_of_days_used = ((leave_entitlement - leave_remaining));
+                        var percentage_of_days_used = ((number_of_days_used/leave_entitlement)*100);
+
+                        document.getElementById("leave_entitlement").innerHTML = leave_entitlement;
+
+                        leave_remaining_object.setAttribute("aria-valuemax", leave_entitlement);
+                        leave_remaining_object.setAttribute("aria-valuenow", leave_entitlement);
+
+                        leave_used_object.setAttribute("aria-valuemax", leave_entitlement);
+
+
+                        leave_remaining_object.setAttribute("style", ("width:" + percentage_remaining + "%"));
+                        leave_remaining_object.setAttribute("aria-valuenow", percentage_remaining);
+
+                        leave_used_object.setAttribute("aria-valuenow", percentage_of_days_used);
+                        leave_used_object.setAttribute("style", ("width:" + percentage_of_days_used + "%"));
+
+                        leave_entitlement_object.innerHTML = (leave_entitlement + " days");
+                        leave_remaining_object.innerHTML = (leave_remaining + " days");
+                        leave_used_object.innerHTML = (number_of_days_used + " days");
+
+
+                        // PROGRAMMING FOR COLOUR OF PROGRESS BARS
+
+                        if(percentage_remaining<25){
+                            leave_remaining_object.setAttribute("class", "progress-bar progress-bar-danger progress-bar-striped");
+
+                        }
+                        else if (percentage_remaining<=59){
+                            leave_remaining_object.setAttribute("class", "progress-bar progress-bar-warning progress-bar-striped");
+
+                        }
+                        else if (percentage_remaining>=60){
+                            leave_remaining_object.setAttribute("class", "progress-bar progress-bar-success progress-bar-striped");
+                        }
+
+
+                        if(percentage_of_days_used<25){
+                            leave_used_object.setAttribute("class", "progress-bar progress-bar-danger progress-bar-striped");
+
+                        }
+                        else if (percentage_of_days_used<=59){
+                            leave_used_object.setAttribute("class", "progress-bar progress-bar-warning progress-bar-striped");
+
+                        }
+                        else if (percentage_of_days_used>=60){
+                            leave_used_object.setAttribute("class", "progress-bar progress-bar-success progress-bar-striped");
+                        }
+
+                    });
+            }
+        });
+    });
+</script>
+
+{% endblock %}

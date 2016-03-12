@@ -1,0 +1,35 @@
+{% extends "login.html" %}
+
+{% block content %}
+
+    <h2>Hi {{ firstname }}, you have successfully sent a leave request for {{ leave_type }}!</h2>
+    <ul>
+        <li>
+            Leave Type: {{ leave_type }}
+        </li>
+        <li>
+            Start Date: {{ start_date }}
+        </li>
+        <li>
+            Start Time: {{ start_date_start_time }}
+        </li>
+        <li>
+            End Date: {{ end_date }}
+        </li>
+        <li>
+            End Time: {{ end_date_start_time }}
+        </li>
+        <li>
+            Leave Reason: {{ leave_reason }}
+        </li>
+        <li>
+            Approval Type: {{ approval_type }}
+        </li>
+        <li>
+            Entries: {{ results }}
+        </li>
+
+    </ul>
+    <p>Click <a href="/account/logout/" here</a> to logout.</p>
+
+{% endblock %}

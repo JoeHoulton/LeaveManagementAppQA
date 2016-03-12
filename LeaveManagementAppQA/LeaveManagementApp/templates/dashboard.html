@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+{% extends "base_file.html" %}
+        {% block title %}LeaveCal - Dashboard{% endblock %}
+
+        {% block head_elements %}
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}/fullcalendar.css">
+
+        <script src="{% get_static_prefix %}/fullcalendar.js"></script>
+
+        {% endblock %}
+
+        {% block dashboard_active %}active{% endblock %}
+
+        {% block content %}
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1 id="dashboard_name" align="center">DASHBOARD</h1>
+            </div>
+        </div>
+        <div class="col-md-12" style="height:20px;">
+        </div>
+
+        <div class="row">
+
+            <div class="col-xs-10 col-xs-offset-1 col-md-4 col-md-offset-1 panel panel-default" id="dashboard_container_one">
+
+                    <div class="col-md-12">
+                        <div class="panel-group">
+                            <div class="panel-heading">
+                                <h2 align="center">Leave Entitlement</h2>
+                            </div>
+
+                            <div class="row">
+                                <h3 align="center" class="number-container" id="leave_entitlement"></h3>
+                            </div>
+
+                            <hr>
+
+                            <div class="row">
+                                <h2 align="center">Leave Remaining</h2>
+                                <h3 align="center" class="number-container" id="leave_remaining_label"></h3>
+                                    <div class="progress">
+                                      <div class="progress-bar progress-bar-warning" id="leave_remaining" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                                      </div>
+                                    </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="row">
+                                <h2 align="center">Bradford Factor</h2>
+                                <h3 align="center" class="number-container" id="bradford_factor_days"></h3>
+
+                                    <div class="progress">
+                                      <div class="progress-bar" id="bradford_factor_progress_bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="700">
+                                      </div>
+                                    </div>
+
+                                <a data-toggle="modal" data-target="#bradfordFactorModal">
+                                    What does this mean?
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+            <div class="col-xs-10 col-xs-offset-1 col-md-5 col-md-offset-1 panel panel-default" id="dashboard_container_two">
+
+                <div class="panel-group">
+                    <div class="panel-heading">
+                        <h2 align="center">Leave Information</h2>
+                    </div>
+
+                    <div class="row">
+                         <div class="col-md-4">
+                            <h3 align="center" class="number-container" id="requests_to_approve_heading">0</h3>
+
+                            <div class="row">
+                                <p align="center"> Requests to Approve </p>
+                            </div>
+
+                            <div class="row">
+                                <div align="center">
+                                    <a href="/leaverequests" class="btn btn-success btn-lg">
+                                        Approve Leave
+                                    </a>
+                                </div>
+                            </div>
+                         </div>
+
+                         <div class="col-md-4">
+                            <h3 align="center" class="number-container" id="pending_requests_heading">0</h3>
+
+                            <div class="row">
+                                <p align="center">  Your Pending Requests  </p>
+                            </div>
+
+                            <div align="center">
+                                <div class="row">
+                                    <a href="/userrequests" align="center" class="btn btn-success btn-lg">
+                                        View Leave
+                                    </a>
+                                </div>
+                            </div>
+                         </div>
+                         <div class="col-md-4">
+                             <h3 align="center" class="number-container" id="approved_requests_heading">0</h3>
+
+                            <div class="row">
+                                <p align="center">  Your Approved Requests  </p>
+                            </div>
+
+                            <div class="row">
+                                <div align="center">
+                                    <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#requestLeaveModal">
+                                        Request Leave
+                                    </button>
+                                </div>
+                            </div>
+
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class=" col-xs-10 col-xs-offset-1 col-md-5 col-md-offset-1 panel panel-default" id="dashboard_container_calendar">
+            <div align="right" class="button-padding">
+                <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#requestLeaveModal" align="right">
+                    Request Leave
+                </button>
+            </div>
+
+            <div id='calendar'>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+<!-- Modal For Bradford Factor successful-->
+                <div class="modal fade" id="bradfordFactorModal" tabindex="-1" role="dialog" aria-labelledby="bradfordFactorModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title" id="bradfordFactorModalLabel">What is the Bradford Factor?</h3>
+                      </div>
+                      <div class="modal-body">
+                          <div class="row">
+                            <div class="col-md-12">
+                                  <h4 id= "bradfordFactorHeading">
+                                        The Bradford Factor is a simple formula that allows companies to apply a relative
+                                        weighting to employee unplanned absences (sickness, Doctors appointments,
+                                        emergency childcare, etc).
+                                        <br/>
+                                        <br/>
+                                        The Bradford Factor supports the principal that
+                                        repeat absences have a greater operational impact than long term sick. Therefore, your score will be higher
+                                        if you have more frequent unplanned absences than a single absense of the totalling the same number of days.
+                                        <br/>
+                                        <br/>
+                                        <h4 style="text-decoration: underline;" >Explanation of Values</h4>
+                                        <br/>
+                                        51 points – verbal warning
+                                        <br/>
+                                        201 points – written warning
+                                        <br/>
+                                        401 points – final warning
+                                        <br/>
+                                        601 points – dismissal
+
+                                  </h4>
+                            </div>
+                        </div>
+                      </div>
+
+                      <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+
+
+{% endblock %}
+{% block scripts %}
+
+   <script>
+    $(document).ready(function() {
+
+        $.loader.open();
+
+
+        getPersonalEvents();
+        getLeaveDetails();
+        getRequestsToApprove();
+        getBradfordFactor();
+
+        getCalendarObject();
+        getCalendarEvents();
+
+        getFormValidation();
+
+    });
+
+    function getCalendarObject(){
+
+        $('#calendar').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			editable: false,
+			eventLimit: true, // allow "more" link when too many events
+		});
+    }
+
+    function getCalendarEvents(){
+        $.ajax({
+            type: "GET",
+            url: "/calendar/getevents/",
+            success: function(data){
+                $.each(data, function(i, event_detail){
+
+                    var start_date_test = "";
+                    var end_date_test = "";
+                    var all_day = "true";
+                    var start_date_month = "";
+                    var start_date_year = "";
+                    var start_date_day = "";
+                    var start_date_time;
+
+                    var leave_type = event_detail["title"];
+                    var start_date = event_detail["start_date"];
+                    var end_date = event_detail["end_date"];
+                    var start_time = event_detail["start_time"];
+                    var end_time = event_detail["end_time"];
+
+                    if (start_time == "Lunchtime"){
+
+                        all_day = false;
+                        start_date_test = $.fullCalendar.moment(start_date.concat(' 13:00'));
+                        }else{
+                            start_date_test = start_date;
+                        }
+
+                    if (end_time == "Lunchtime"){
+                        all_day = false;
+                        end_date_test = $.fullCalendar.moment(end_date.concat(' 13:00'));
+                    }else{
+                        end_date_test = end_date;
+                    }
+
+                    var backgroundColourOfEvent = "";
+
+                    if(leave_type == "Annual Leave"){
+                        backgroundColourOfEvent = 'green';
+                    }
+                    else if(leave_type == "Sick Leave"){
+                        backgroundColourOfEvent = '#ED1317';
+                    }
+                    else if(leave_type == "Compassionate Leave"){
+                        backgroundColourOfEvent = 'black';
+                    }
+                    else if(leave_type == "Parental Leave"){
+                        backgroundColourOfEvent = 'yellow';
+                    }
+                    else if(leave_type == "Leave in Lieu"){
+                        backgroundColourOfEvent = 'orange';
+                    }
+                    else if(leave_type == "Other Leave"){
+                        backgroundColourOfEvent = 'blue';
+                    }
+
+                    var myEvent = {
+                          title:leave_type.concat(" - ").concat(start_date).concat(" to ").concat(end_date),
+                          allDay: all_day,
+                          start: start_date_test,
+                          end: end_date_test,
+                          backgroundColor: backgroundColourOfEvent
+                        };
+
+                    $('#calendar').fullCalendar( 'renderEvent', myEvent, true );
+                });
+
+            }
+        });
+    }
+
+    function getPersonalEvents(){
+        $.ajax({
+            type: "GET",
+            url: "/dashboard/getpersonalevents/",
+            success: function(data){
+                $.each(data, function(i, event_detail){
+                    var pendingLeaveEventCountObject = document.getElementById("pending_requests_heading");
+                    pendingLeaveEventCountObject.innerHTML = event_detail["pending_leave_event_count"];
+
+                    var approvedLeaveEventCountObject = document.getElementById("approved_requests_heading");
+                    approvedLeaveEventCountObject.innerHTML = event_detail["approved_leave_event_count"];
+                });
+            }
+        });
+    }
+
+
+
+    function getRequestsToApprove(){
+        $.ajax({
+            type: "GET",
+            url: "/dashboard/getrequeststoapprove/",
+            success: function(data){
+                $.each(data, function(i, event_detail){
+                    var pendingApprovalsObject = document.getElementById("requests_to_approve_heading");
+                    pendingApprovalsObject.innerHTML = event_detail["requests_to_approve_count"];
+                });
+            }
+        });
+    }
+
+    function getBradfordFactor(){
+        $.ajax({
+            type: "GET",
+            url: "/dashboard/getbradfordfactor/",
+            success: function(data){
+                $.each(data, function(i, event_detail){
+
+                    var bradfordFactorObject = document.getElementById("bradford_factor_progress_bar");
+                    var bradfordFactorDays = document.getElementById("bradford_factor_days");
+
+                    bradfordFactorValue = event_detail["bradford_factor"];
+
+                    //bradfordFactorObject.innerHTML = bradfordFactorValue;
+                    bradfordFactorDays.innerHTML = bradfordFactorValue;
+
+                    bradford_factor_max_value = 700;
+
+                    bradford_factor_percentage = ((bradfordFactorValue/bradford_factor_max_value) * 100);
+
+                    bradford_factor_calculated_percentage = 0
+
+                    if(bradford_factor_percentage<25){
+                        bradfordFactorObject.setAttribute("class", "progress-bar progress-bar-success progress-bar-striped");
+
+                        bradford_factor_calculated_percentage = 25
+
+                    }
+                    else if (bradford_factor_percentage<=59){
+                        bradfordFactorObject.setAttribute("class", "progress-bar progress-bar-warning progress-bar-striped");
+                        bradford_factor_calculated_percentage = 60
+
+                    }
+                    else if (bradford_factor_percentage>=60){
+                        bradfordFactorObject.setAttribute("class", "progress-bar progress-bar-danger progress-bar-striped");
+                        bradford_factor_calculated_percentage = 61
+                    }
+
+
+
+                    bradfordFactorObject.setAttribute("style", ("width:" + bradford_factor_calculated_percentage + "%"));
+                    bradfordFactorObject.setAttribute("aria-valuenow", bradford_factor_calculated_percentage)
+
+                    $.loader.close();
+
+                });
+            }
+        });
+
+    }
+
+    function getLeaveDetails(){
+            $.ajax({
+                type: "GET",
+                url: "/account/leavedetails/",
+                success: function(data){
+                    $.each(JSON.parse(data), function(i, event_detail){
+
+                        var leave_entitlement = event_detail["leave_entitlement"];
+                        var leave_remaining = event_detail["leave_remaining"];
+
+                        var leave_remaining_object = document.getElementById("leave_remaining");
+                        var leave_entitlement_object = document.getElementById("leave_entitlement");
+
+                        var percentage_remaining = ((leave_remaining/leave_entitlement)*100);
+                        var number_of_days_used = ((leave_entitlement - leave_remaining));
+                        var percentage_of_days_used = ((number_of_days_used/leave_entitlement)*100);
+
+                        document.getElementById("leave_entitlement").innerHTML = leave_entitlement;
+                        document.getElementById("leave_remaining_label").innerHTML = (leave_remaining + " days");
+
+                        leave_remaining_object.setAttribute("aria-valuemax", leave_entitlement);
+                        leave_remaining_object.setAttribute("aria-valuenow", leave_entitlement);
+
+                        leave_remaining_object.setAttribute("style", ("width:" + percentage_remaining + "%"));
+                        leave_remaining_object.setAttribute("aria-valuenow", percentage_remaining);
+
+                        leave_entitlement_object.innerHTML = (leave_entitlement + " days");
+
+                        // PROGRAMMING FOR COLOUR OF PROGRESS BARS
+
+                        if(percentage_remaining<25){
+                            leave_remaining_object.setAttribute("class", "progress-bar progress-bar-danger progress-bar-striped");
+
+                        }
+                        else if (percentage_remaining<=59){
+                            leave_remaining_object.setAttribute("class", "progress-bar progress-bar-warning progress-bar-striped");
+
+                        }
+                        else if (percentage_remaining>=60){
+                            leave_remaining_object.setAttribute("class", "progress-bar progress-bar-success progress-bar-striped");
+                        }
+
+                    });
+            }
+        });
+        }
+
+    function sendLeaveRequest(){
+
+        var leaveType = document.getElementById("leaveType").value;
+        var start_date = document.getElementById("start_date").value;
+        var end_date = document.getElementById("end_date").value;
+        var start_date_start_time = document.getElementById("startDateStartTime").value;
+        var end_date_start_time = document.getElementById("endDateEndTime").value;
+        var leave_reason = document.getElementById("leaveReason").value;
+        var approval_type = $('input[name="optradio"]:checked').val();
+
+        $.ajax({
+                type: "POST",
+                url: "/dashboard/submitrequest/",
+                async: true,
+                data: {
+                    leaveType: leaveType,
+                    start_date: start_date,
+                    end_date: end_date,
+                    start_date_start_time: start_date_start_time,
+                    end_date_start_time: end_date_start_time,
+                    leave_reason: leave_reason,
+                    approval_type: approval_type
+                },
+
+                beforeSend: function(data){
+
+                },
+
+                success: function(data){
+
+                        if(data[0] == "unsucessful"){
+                            $('#requestLeaveModal').modal('hide');
+                            $('#postSubmissionModalUnsuccessful').modal('show');
+
+                            var reasonValue =  document.getElementById("ReasonValue");
+                            reasonValue.innerHTML = data[1];
+                        }
+                        else {
+                            $('#requestLeaveModal').modal('hide');
+                            $('#postSubmissionModal').modal('show');
+
+                            var leaveTypeValue =  document.getElementById("LeaveTypeValue");
+                            leaveTypeValue.innerHTML = leaveType;
+
+                            var startDateValue =  document.getElementById("startDateValue");
+                            startDateValue.innerHTML = start_date;
+
+                            var endDateValue =  document.getElementById("endDateValue");
+                            endDateValue.innerHTML = end_date;
+
+                            var startTimeValue =  document.getElementById("startTimeValue");
+                            startTimeValue.innerHTML = start_date_start_time;
+
+                            var endTimeValue =  document.getElementById("endTimeValue");
+                            endTimeValue.innerHTML = end_date_start_time;
+
+                            var leaveReasonValue =  document.getElementById("leaveReasonValue");
+                            leaveReasonValue.innerHTML = leave_reason;
+                        }
+                },
+
+                failure: function(response, opts) {
+                    console.log('server-side failure: ' + response);
+                },
+        });
+
+    }
+
+
+    function getFormValidation(){
+        $('#eventForm').bootstrapValidator({
+            framework: 'bootstrap',
+            button: {
+                selector: '#submitButton',
+            },
+            container: '#messages',
+            live: 'enabled',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                start_date: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The start date is required and cannot be empty'
+                        }
+                    }
+                },
+                startDateStartTime: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The start date is required and cannot be empty'
+                        },
+                        callback: {
+                            callback: function (value, validator, $field) {
+
+                                var startDate = $("#start_date").val();
+                                var endDate = $("#end_date").val();
+                                var endDateTime = $("#endDateEndTime").val();
+                                var startDateTime = $("#startDateStartTime").val();
+
+                                startDate = new Date(startDate);
+                                endDate = new Date(endDate);
+
+                                if (startDate == endDate){
+                                    alert("dates are the same");
+                                    if(endDateTime == "Lunchtime" && startDateTime == "Lunchtime"){
+                                       alert("same date and both equal lunchtime");
+                                            return {
+                                                valid: false,
+                                                message: 'Leave cannot start and finish at the same time on the same day.'
+                                            }
+                                    }
+                                    else {
+                                        return {
+                                                valid: true
+                                            }
+                                    }
+                                }
+                                else{
+                                    return {
+                                                valid: true
+                                            }
+                                }
+                            }
+                        }
+                    }
+                },
+                end_date: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The end date is required and cannot be empty'
+                        },
+                        callback: {
+                            callback: function (value, validator, $field) {
+
+                                var startDate = $("#start_date").val();
+                                var endDate = $("#end_date").val();
+
+                                startDate = new Date(startDate);
+                                endDate = new Date(value);
+
+                                if (endDate <= startDate){
+                                    //alert("end date less than start date");
+                                    return {
+                                                valid: false,
+                                                message: 'Start date has to be earlier than or equal to the end date'
+                                            }
+                                }
+                                else {
+                                    //alert("date is fine now");
+                                    return {
+                                        valid: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                endDateEndTime: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The end time is required and cannot be empty'
+                        },
+                        callback: {
+                            callback: function (value, validator, $field) {
+
+                                var startDate = $("#start_date").val();
+                                var endDate = $("#end_date").val();
+                                var endDateTime = $("#endDateEndTime").val();
+                                var startDateTime = $("#startDateStartTime").val();
+
+                                startDate = new Date(startDate);
+                                endDate = new Date(endDate);
+
+                                if (startDate == endDate){
+                                    alert("dates are the same");
+                                    if(endDateTime == "Lunchtime" && startDateTime == "Lunchtime"){
+                                       alert("same date and both equal lunchtime");
+                                            return {
+                                                valid: false,
+                                                message: 'Leave cannot start and finish at the same time on the same day.'
+                                            }
+                                    }
+                                    else {
+                                        return {
+                                                valid: true
+                                            }
+                                    }
+                                }
+                                else{
+                                    return {
+                                                valid: true
+                                            }
+                                }
+                            }
+                        }
+                    }
+                },
+                leaveReason: {
+                    validators: {
+                        stringLength: {
+                            max: 300,
+                            message: 'The Reason must be less than 300 characters long'
+                        }
+                    }
+                },
+                leaveType: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The type of leave is required and cannot be empty'
+                        },
+                        stringLength: {
+                            max: 70,
+                            message: 'The leave type must be less than 70 characters long'
+                        }
+                    }
+                },
+                optradio: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The content is required and cannot be empty'
+                        },
+                    }
+                },
+            },
+
+        })
+        .on('init.form.bv', function(e, data) {
+            alert("IM GETTING IN INITIALISE FORM");
+            validator.disableSubmitButtons(false);
+        })
+        .on('success.form.bv', function(e, data) {
+            // Prevent form submission
+            e.preventDefault();
+
+            var $form        = $(e.target),
+                validator    = $form.data('bootstrapValidator'),
+                submitButton = validator.getSubmitButton();
+
+
+            validator.disableSubmitButtons(false);
+
+            sendLeaveRequest();
+        })
+        .on('err.form.bv', function(e, data) {
+             alert("Finding errors in the form");
+             $(form).data('formValidation').resetForm();
+        });
+    }
+    </script>
+
+{% endblock %}
+

@@ -1,0 +1,120 @@
+{% extends "base_file.html" %}
+        {% block title %}LeaveCal - Team Requests{% endblock %}
+
+        {% block team_requests_active %}active{% endblock %}
+        {% block content %}
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h1 id="login_content" name="request_leave_title" align="center">TEAM REQUESTS</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <h3 id="login_content" name="request_leave_title" align="center">Below detials the next upcoming leave events for each of your team members</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container panel panel-default col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1">
+                <div class="table-responsive">
+                <table class="table table-hover col-md-12" id="leaveRequestTable">
+                <thead>
+                  <tr>
+                    <th><h3>Name</h3></th>
+                    <th><h3>Leave Type</h3></th>
+                    <th><h3>Start Date</h3></th>
+                    <th><h3>Start Time</h3></th>
+                    <th><h3>End Date</h3></th>
+                    <th><h3>End Time</h3></th>
+                    <th><h3>Reason</h3></th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+              </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel-group">
+                <h1></h1>
+            </div>
+        </div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    $(document).ready(function() {
+
+        $.loader.open();
+
+        $.ajax({
+                type: "GET",
+                url: "/leaverequests/getallteamleaverequests/",
+                success: function(data){
+                    $.each(data, function(i, event_detail){
+
+                        var start_date_test = "";
+                        var end_date_test = "";
+                        var all_day = "true";
+                        var start_date_month = "";
+                        var start_date_year = "";
+                        var start_date_day = "";
+                        var start_date_time;
+                        var leave_id = "";
+
+                        var name = event_detail["name"];
+                        var title = event_detail["title"];
+                        var start_date = event_detail["start_date"];
+                        var end_date = event_detail["end_date"];
+                        var start_time = event_detail["start_time"];
+                        var end_time = event_detail["end_time"];
+                        var reason = event_detail["reason"];
+                        var leave_id = event_detail["leave_id"];
+
+                        var table = document.getElementById("leaveRequestTable");
+
+                        var row = table.insertRow(i+1);
+
+                        var table_name = row.insertCell(0);
+                        var table_leave_type = row.insertCell(1);
+                        var table_start_date = row.insertCell(2);
+                        var table_start_time = row.insertCell(3);
+                        var table_end_date = row.insertCell(4);
+                        var table_end_time = row.insertCell(5);
+                        var table_reason = row.insertCell(6);
+
+                        h3_element = document.createElement("h4");
+                        table_name.appendChild(h3_element);
+
+
+
+                        h3_element.innerHTML = name;
+                        table_leave_type.innerHTML = title;
+                        table_start_date.innerHTML = start_date;
+                        table_start_time.innerHTML = start_time;
+                        table_end_date.innerHTML = end_date;
+                        table_end_time.innerHTML = end_time;
+                        table_reason.innerHTML = reason;
+
+                        if(title == ""){
+                            table_leave_type.innerHTML = "No upcoming Leave Events"
+                        }
+                    });
+                },
+                complete : function (){
+                    $.loader.close();
+                }
+            });
+
+        });
+
+</script>
+
+{% endblock %}
+

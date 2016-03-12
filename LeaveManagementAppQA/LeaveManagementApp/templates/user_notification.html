@@ -1,0 +1,15 @@
+{% extends "email_notification_base.html" %}
+
+{% block content %}
+
+    <h2>Leave Request Submitted</h2>
+
+    <h4>Leave Type: {{ leave_type }}</h4>
+    <h4>Start Date: {{ start_date }}</h4>
+    <h4>Start Time: {{ start_time }}</h4>
+    <h4>End Date: {{ end_date }}</h4>
+    <h4>End Time: {{ end_time }}</h4>
+    <h4>Reason: {{ reason }}</h4>
+    <h4>ID: {{ ID }}</h4>
+
+{% endblock %}

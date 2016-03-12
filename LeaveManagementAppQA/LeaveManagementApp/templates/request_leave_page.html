@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+{% extends "base_file.html" %}
+        {% block title %}LeaveCal - Approve Leave{% endblock %}
+
+        {% block leave_requests_active %}active{% endblock %}
+        {% block content %}
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h1 id="login_content" name="request_leave_title" align="center">APPROVE LEAVE</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container panel panel-default col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1">
+                <div class="table-responsive">
+                <table class="table table-hover col-md-12" id="leaveRequestTable">
+                <thead>
+                  <tr>
+                    <th><h3>Name</h3></th>
+                    <th><h3>Leave Type</h3></th>
+                    <th><h3>Start Date</h3></th>
+                    <th><h3>Start Time</h3></th>
+                    <th><h3>End Date</h3></th>
+                    <th><h3>End Time</h3></th>
+                    <th><h3>Reason</h3></th>
+                    <th><h3>Status</h3></th>
+                    <th><h3>Approve/Decline</h3></th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+              </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel-group">
+                <h1></h1>
+            </div>
+        </div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+
+        getLeaveRequests();
+
+    });
+
+    function getLeaveRequests(){
+
+            $.ajax({
+                type: "GET",
+                url: "/leaverequests/getleaverequests/",
+                beforeSend : function(){
+                    $.loader.open();
+                },
+                success: function(data){
+                    $.each(data, function(i, event_detail){
+
+                        var start_date_test = "";
+                        var end_date_test = "";
+                        var all_day = "true";
+                        var start_date_month = "";
+                        var start_date_year = "";
+                        var start_date_day = "";
+                        var start_date_time;
+                        var leave_id = "";
+
+                        var name = event_detail["name"];
+                        var title = event_detail["title"];
+                        var start_date = event_detail["start_date"];
+                        var end_date = event_detail["end_date"];
+                        var start_time = event_detail["start_time"];
+                        var end_time = event_detail["end_time"];
+                        var reason = event_detail["reason"];
+                        var status = event_detail["status"];
+                        var leave_id = event_detail["leave_id"];
+
+                        var table = document.getElementById("leaveRequestTable");
+
+                        var row = table.insertRow(i+1);
+
+                        var table_name = row.insertCell(0);
+                        var table_leave_type = row.insertCell(1);
+                        var table_start_date = row.insertCell(2);
+                        var table_start_time = row.insertCell(3);
+                        var table_end_date = row.insertCell(4);
+                        var table_end_time = row.insertCell(5);
+                        var table_reason = row.insertCell(6);
+                        var table_status = row.insertCell(7);
+                        var table_response = row.insertCell(8);
+
+                        table_name.innerHTML = name;
+                        table_leave_type.innerHTML = title;
+                        table_start_date.innerHTML = start_date;
+                        table_start_time.innerHTML = start_time;
+                        table_end_date.innerHTML = end_date;
+                        table_end_time.innerHTML = end_time;
+                        table_reason.innerHTML = reason;
+                        table_status.innerHTML = status;
+
+                        addFormElements(table_response, leave_id);
+
+                    });
+                },
+                complete : function(){
+                    $.loader.close();
+                }
+            });
+
+        }
+
+    function addFormElements(table_response, leave_id){
+
+                var approval_form = document.createElement("form");
+                approval_form.setAttribute('onsubmit',"return false;");
+
+                var approved_button = document.createElement("input");
+
+                approved_button.setAttribute('type',"button");
+                approved_button.setAttribute('id',("Approve" + leave_id));
+                approved_button.setAttribute('value',"Approve");
+                approved_button.setAttribute('class',"btn btn-success");
+                approved_button.setAttribute('name',"approved_button");
+                approved_button.setAttribute('leave_id',leave_id);
+                approved_button.setAttribute('onClick',"setApprovalStatus(this);");
+
+
+                var declined_button = document.createElement("input");
+
+                declined_button.setAttribute('type',"button");
+                declined_button.setAttribute('id',("Decline" + leave_id));
+                declined_button.setAttribute('value',"Decline");
+                declined_button.setAttribute('class',"btn btn-danger");
+                declined_button.setAttribute('name',"declined_button");
+                declined_button.setAttribute('leave_id',leave_id);
+                declined_button.setAttribute('onClick',"setApprovalStatus(this);");
+
+                var hidden_field = document.createElement("input"); //input element, text
+                hidden_field.setAttribute('type',"hidden");
+                hidden_field.setAttribute('name',"leave_id");
+                hidden_field.setAttribute('value',leave_id);
+
+                approved_button.appendChild(hidden_field);
+                declined_button.appendChild(hidden_field);
+
+                approval_form.appendChild(approved_button);
+                approval_form.appendChild(declined_button);
+                approval_form.appendChild(hidden_field);
+
+                table_response.appendChild(approval_form);
+
+            }
+
+    function setApprovalStatus(calling_element){
+
+        var current_leave_id = document.getElementById(calling_element.id).getAttribute("leave_id");
+        var current_name = document.getElementById(calling_element.id).getAttribute("name");
+
+        $.ajax({
+                type: "POST",
+                url: "/event/approvedlocal/",
+                data: { leave_id: current_leave_id,
+                        name: current_name,
+                },
+                beforeSend : function (){
+                    $.loader.open();
+                },
+                success: function(data){
+                    $.loader.close();
+                    getLeaveRequests();
+
+                },
+                failure: function(response, opts) {
+                    console.log('server-side failure: ' + response);
+                },
+            });
+    }
+
+</script>
+
+{% endblock %}
+
