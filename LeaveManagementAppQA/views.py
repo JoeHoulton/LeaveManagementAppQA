@@ -11,17 +11,22 @@ from django.template import RequestContext
 
 logger = logging.getLogger(__name__)
 
+
+# Index page
 def index(request):
     c = {}
     c.update(csrf(request))
 
     if request.user.is_authenticated():
         logger.error("Is authentecated")
-        return HttpResponseRedirect('/dashboard')
+        response = HttpResponseRedirect('/dashboard')
+        return response
     else:
         logger.error("Is not authentecated")
         return render_to_response('login.html', c)
 
+
+# 404 error handler (Not in use)
 def handler404(request):
     response = render_to_response('404.html', {},
                                   context_instance=RequestContext(request))

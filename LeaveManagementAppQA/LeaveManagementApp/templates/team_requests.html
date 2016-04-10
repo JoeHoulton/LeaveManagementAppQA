@@ -2,8 +2,10 @@
         {% block title %}LeaveCal - Team Requests{% endblock %}
 
         {% block team_requests_active %}active{% endblock %}
+        {% block username_to_display %}{{ username }}{% endblock %}
         {% block content %}
 
+        <!--Title Div-->
         <div class="row">
             <div class="col-xs-12">
                 <h1 id="login_content" name="request_leave_title" align="center">TEAM REQUESTS</h1>
@@ -14,7 +16,7 @@
                 <h3 id="login_content" name="request_leave_title" align="center">Below detials the next upcoming leave events for each of your team members</h3>
             </div>
         </div>
-
+        <!--Table for Team Leave Requests-->
         <div class="row">
             <div class="container panel panel-default col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1">
                 <div class="table-responsive">

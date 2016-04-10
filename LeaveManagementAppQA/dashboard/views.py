@@ -1,26 +1,17 @@
-from django.shortcuts import render
-
-import time
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect,HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
-from django.core.context_processors import csrf
-from django.shortcuts import render_to_response
 from django.http import HttpResponse
-import datetime
-from django.http import Http404
-from django.core.mail import send_mail
-from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
-import json
-import logging
-from dateutil.relativedelta import relativedelta
-
+from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
+from django.http import Http404
+from django.core.mail import EmailMultiAlternatives
+from dateutil.relativedelta import relativedelta
 from django.views.decorators.csrf import csrf_exempt
-
 from django.template.loader import get_template
 from django.template import Context
+
+import datetime
+import json
+import logging
 
 from LeaveManagementAppQA.cal.models import LEAVE_EVENTS
 from LeaveManagementAppQA.accounts.models import Employee
@@ -30,11 +21,15 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def dashboard(request):
-    c = {}
+    c = {'username': request.user}
     c.update(csrf(request))
 
     return render_to_response('dashboard.html', c)
 
+# Get data from Leave Request form
+# Validate this data
+# If data valid, save Leave Event in database and inform user
+# If unsuccessful, provide feedback as to why
 @csrf_exempt
 def leave_request_submit(request):
 
@@ -53,15 +48,12 @@ def leave_request_submit(request):
     start_date_start_time = request.POST.get('start_date_start_time','')
     end_date_start_time = request.POST.get('end_date_start_time','')
     leave_reason = request.POST.get('leave_reason','')
-    approval_type = request.POST.get('approval_type','')
     leave_status = "Pending"
 
     start_date = datetime.datetime.strptime(start_date, "%d/%m/%Y").strftime("%Y-%m-%d")
     end_date = datetime.datetime.strptime(end_date, "%d/%m/%Y").strftime("%Y-%m-%d")
 
     #check if user doesnt already have a leave event in that time period
-
-
 
     if leave_event_is_less_than_six_months_in_the_past(start_date):
 
@@ -107,6 +99,7 @@ def leave_request_submit(request):
     else:
         raise Http404
 
+# Get pending and approved leave event count for logged in user
 @login_required
 def get_personal_leave_requests_ajax(request):
     leave_request_dictionary = {}
@@ -136,6 +129,7 @@ def get_personal_leave_requests_ajax(request):
     else:
         raise Http404
 
+# Get countof Approved events for logged in user.
 @login_required
 def get_personal_approved_leave_requests_ajax(request):
     leave_request_dictionary = {}
@@ -165,6 +159,7 @@ def get_personal_approved_leave_requests_ajax(request):
     else:
         raise Http404
 
+# Get count of oustsanding requests the user has to approve
 @login_required
 def get_team_leave_requests(request):
 
@@ -174,7 +169,6 @@ def get_team_leave_requests(request):
     requests_to_approve_count = 0;
     pending_state = "Pending";
 
-    #gets username of logged in user
     user_username = request.user
 
     pending_state = "Pending"
@@ -202,6 +196,7 @@ def get_team_leave_requests(request):
     else:
         raise Http404
 
+# Calculate Bradford Factor value for currently logged in user
 @login_required
 def get_bradford_factor(request):
     bradford_factor_dictionary = {}
@@ -212,7 +207,6 @@ def get_bradford_factor(request):
 
     number_of_sick_absences = 0
     days_of_sick_absence = 0
-
     bradford_factor = 0
 
     user_id = request.user
@@ -222,21 +216,12 @@ def get_bradford_factor(request):
 
         number_of_sick_absences = number_of_sick_absences + 1
 
-        leave_event_start_date = str(leave_event.start_date)
-        leave_event_start_time = str(leave_event.start_time)
-        leave_event_end_date = str(leave_event.end_date)
-        leave_event_end_time = str(leave_event.end_time)
-
-        days_of_sick_absence = ((datetime.datetime.strptime(leave_event_end_date, "%Y-%m-%d").date() - datetime.datetime.strptime(leave_event_start_date, "%Y-%m-%d").date()).days)
-
-        if leave_event_start_time == "Lunchtime":
-            days_of_sick_absence = (days_of_sick_absence - 0.5)
-
-        if leave_event_end_time == "Lunchtime":
-            days_of_sick_absence = (days_of_sick_absence - 0.5)
-
+        days_of_sick_absence = days_of_sick_absence + calculate_days_of_leave_event(leave_event)
 
     bradford_factor = (number_of_sick_absences * number_of_sick_absences * days_of_sick_absence)
+
+    logger.error("Calculated Number of sick absences: " + str(number_of_sick_absences))
+    logger.error("Calculated Days of sick absences: " + str(days_of_sick_absence))
 
     bradford_factor_dictionary = {
         'bradford_factor': (bradford_factor),
@@ -252,11 +237,10 @@ def get_bradford_factor(request):
         raise Http404
 
 
-
+# Send email notification to manager
 def send_simple_manager_notification(username, leave_type, start_date, end_date, start_date_start_time, end_date_start_time, leave_reason, leave_event_id):
 
     manager_email = get_manager_email(username)
-
 
     if manager_is_currently_on_holiday(username):
         managers_manager_object = get_manager(get_manager(username).username)
@@ -273,13 +257,14 @@ def send_simple_manager_notification(username, leave_type, start_date, end_date,
                   'start_date': start_date, 'end_date': end_date, 'start_time': start_date_start_time, 'end_time': end_date_start_time,
                   'reason': leave_reason, 'ID': leave_event_id})
 
-    subject, from_email, to = 'Leave Request From', 'LeaveCal <postmaster@sandboxb59750eb67074ec3bfcc9a8926bad0d1.mailgun.org>', manager_email
+    subject, from_email, to = str('Leave Request From ' + str(username)), 'LeaveCal <postmaster@sandboxb59750eb67074ec3bfcc9a8926bad0d1.mailgun.org>', manager_email
     text_content = plaintext.render(d)
     html_content = htmly.render(d)
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
+# Send email notification to user
 def send_simple_user_notification(username_passed, leave_type, start_date, end_date, start_date_start_time, end_date_start_time, leave_reason, leave_event_id):
 
     user_email = (User.objects.filter(username=username_passed)[0].email)
@@ -298,6 +283,7 @@ def send_simple_user_notification(username_passed, leave_type, start_date, end_d
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
+# Get email of the currently logged in user's manager
 def get_manager_email(username_of_managed_user):
 
     id_of_current_user = User.objects.get(username=username_of_managed_user).id
@@ -308,6 +294,7 @@ def get_manager_email(username_of_managed_user):
 
     return str(manager_email)
 
+# Get manager of the currently logged in user
 def get_manager(username_of_managed_user):
 
     id_of_current_user = User.objects.get(username=username_of_managed_user).id
@@ -320,7 +307,7 @@ def get_manager(username_of_managed_user):
 
     return manager_object
 
-
+# Test Leave Event is less than six monthsin the past
 def leave_event_is_less_than_six_months_in_the_past(start_date_of_leave_event):
 
     six_months_in_the_past = datetime.datetime.today().date() - relativedelta(months=6)
@@ -335,6 +322,7 @@ def leave_event_is_less_than_six_months_in_the_past(start_date_of_leave_event):
     else:
         return True
 
+# Determine if Leave Event spans more days than the user has remaining
 def leave_event_is_less_days_than_user_has_remaining(leave_event_to_calculate, current_user_id):
 
     number_of_days = calculate_days_of_leave_event(leave_event_to_calculate)
@@ -349,6 +337,7 @@ def leave_event_is_less_days_than_user_has_remaining(leave_event_to_calculate, c
     else:
         return False
 
+# Calcualte span days of Leave Event
 def calculate_days_of_leave_event(leave_event):
 
     leave_event_start_date = str(leave_event.start_date)
@@ -364,14 +353,10 @@ def calculate_days_of_leave_event(leave_event):
     if leave_event_end_time == "Lunchtime":
         days_of_leave_event = (days_of_leave_event - 0.5)
 
-    return days_of_leave_event
+    return days_of_leave_event + 1
 
+# Ensure requested Leave Event does not span within time of other leave events
 def user_does_not_have_another_leave_request_in_that_time_period(leave_event_to_calculate, username):
-
-    six_months_in_the_past = datetime.datetime.today().date() - relativedelta(months=6)
-    # get all leave events for user
-    # get span of dates
-    # If dates are the same check span of dates not within start and end date of user, taking into account Lunchtime event
 
     start_date_of_leave_event = datetime.datetime.strptime(leave_event_to_calculate.start_date, '%Y-%m-%d').date()
     end_date_of_leave_event = datetime.datetime.strptime(leave_event_to_calculate.end_date, '%Y-%m-%d').date()
@@ -415,14 +400,6 @@ def user_does_not_have_another_leave_request_in_that_time_period(leave_event_to_
                         if (start_time_of_current_leave_event == "Lunchtime") & (end_time_of_leave_event != "Lunchtime"):
                             events_dont_clash = False
 
-        #elif (start_date_of_leave_event > start_date_of_current_leave_event):
-        #    if (start_date_of_leave_event <= end_date_of_current_leave_event):
-        #        events_dont_clash = False
-
-         #   elif (start_date_of_leave_event == start_date_of_current_leave_event):
-          #      if (end_time_of_leave_event != "Lunchtime") & (start_time_of_current_leave_event != "Lunchtime"):
-           #         events_dont_clash = False
-
         elif (start_date_of_leave_event == end_date_of_current_leave_event):
             logger.error("GOT IN HERE 1")
             if (end_date_of_leave_event > end_date_of_current_leave_event):
@@ -430,17 +407,33 @@ def user_does_not_have_another_leave_request_in_that_time_period(leave_event_to_
                 if (end_time_of_current_leave_event == "Lunchtime") & (start_time_of_leave_event != "Lunchtime"):
                     logger.error("GOT IN HERE 2.5")
                     events_dont_clash = False
+                if (end_time_of_current_leave_event == "End of Day"):
+                    logger.error("GOT IN HERE 3")
+                    events_dont_clash = False
+            elif (start_time_of_leave_event == start_time_of_current_leave_event) & (end_time_of_leave_event == end_time_of_current_leave_event):
+                    events_dont_clash = False
+            elif (end_time_of_leave_event == "End of Day") & (end_time_of_current_leave_event == "End of Day"):
+                    events_dont_clash = False
+
+            logger.error("Not got anywhere else")
 
         elif (start_date_of_leave_event == start_date_of_current_leave_event):
             if (end_date_of_leave_event == end_date_of_current_leave_event):
                 if (start_time_of_current_leave_event == "Beginning of Day") & (end_time_of_current_leave_event == "End of Day"):
+                    logger.error("Got in here A")
                     events_dont_clash = False
                 elif (start_time_of_leave_event == "Beginning of Day") & (end_time_of_leave_event == "Lunchtime"):
+                    logger.error("Got in here B")
                     if (start_time_of_leave_event != "Lunchtime") & (end_time_of_leave_event != "End of Day"):
+                        logger.error("Got in here BA")
                         events_dont_clash = False
                 elif (start_time_of_current_leave_event == "Lunchtime") & (end_time_of_current_leave_event == "End of Day"):
                     if (start_time_of_leave_event != "Beginning of Day") & (end_time_of_leave_event != "Lunchtime"):
                         events_dont_clash = False
+                elif (end_time_of_leave_event == end_time_of_current_leave_event):
+                    events_dont_clash = False
+                elif (start_time_of_leave_event == start_time_of_current_leave_event) & (end_time_of_leave_event == end_time_of_current_leave_event):
+                    events_dont_clash = False
             else:
                 events_dont_clash = False
 
@@ -449,12 +442,12 @@ def user_does_not_have_another_leave_request_in_that_time_period(leave_event_to_
 
     return events_dont_clash == True
 
+# Determine if manager is currently on holidat
 def manager_is_currently_on_holiday(username_of_managed_user):
 
     logger.error("")
 
     manager_object = get_manager(username_of_managed_user)
-    manager_username = str(manager_object.username)
 
     logger.error("2")
 
@@ -462,30 +455,22 @@ def manager_is_currently_on_holiday(username_of_managed_user):
 
     logger.error("3")
 
-    current_set_of_leave_events = LEAVE_EVENTS.objects.exclude(status="Cancelled").exclude(status="Declined")
+    current_set_of_leave_events = LEAVE_EVENTS.objects.filter(creator_id=manager_object)
 
-    logger.error("4")
-
-    current_set_of_leave_events = LEAVE_EVENTS.objects.exclude(start_date__gte=todays_date).exclude(end_date__lte=todays_date)
-
-    logger.error("5")
-
-    new_set_of_leave_events = current_set_of_leave_events
-
-    logger.error("6")
-
-    manager_is_on_holiday = False
-
-    logger.error("Current set: " + str(current_set_of_leave_events))
-
-    while manager_is_on_holiday == False:
-        for event in current_set_of_leave_events:
-            if str(event.creator_id)!=str(manager_username):
-                logger.error("7")
-                manager_is_on_holiday == True
-                #new_set_of_leave_events.remove(event)
-
-    logger.error("length of array: " + len(new_set_of_leave_events))
+    if len(current_set_of_leave_events) != 0:
+        logger.error("IN HERE")
+        current_set_of_leave_events = current_set_of_leave_events.filter(status="Approved")
+        current_set_of_leave_events = current_set_of_leave_events.exclude(start_date__gte=todays_date).exclude(end_date__lte=todays_date)
+        if len(current_set_of_leave_events) != 0:
+            logger.error("Leave events that are left: " + str(current_set_of_leave_events))
+            logger.error("On holiday")
+            manager_is_on_holiday = True
+        else:
+            logger.error("Flat out working")
+            manager_is_on_holiday = False
+    else:
+        logger.error("NOPE IN HERE")
+        manager_is_on_holiday = False
 
     return manager_is_on_holiday
 

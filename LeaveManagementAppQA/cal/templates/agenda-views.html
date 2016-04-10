@@ -12,6 +12,7 @@
     {% endblock head_elements %}
 
     {% block calendar_active %}active{% endblock %}
+    {% block username_to_display %}{{ username }}{% endblock %}
 
 
 {% block content %}
@@ -25,12 +26,20 @@
      <div class="container col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1" id="calendar_container_one">
         <div class="row">
             <div class="panel panel-default" id="calendar_container_two">
-                <div align="right" class="button-padding">
-                    <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#requestLeaveModal" align="right">
-                        Request Leave
-                    </button>
+                <div class="col-xs-6 text-left">
+                    <div align="left" class="button-padding">
+                        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#calendarKey" align="left">
+                            Key
+                        </button>
+                    </div>
                 </div>
-
+                <div class="col-xs-6 text-right">
+                    <div align="right" class="button-padding">
+                        <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#requestLeaveModal" align="right">
+                            Request Leave
+                        </button>
+                    </div>
+                </div>
                 <div id="container_padding">
                      <div id='calendar'>
                      </div>
@@ -39,110 +48,6 @@
         </div>
      </div>
 
-
-
-
-     <!-- Modal To Submit Leave Request -->
-                <div class="modal fade" id="requestLeaveModal" tabindex="-1"  role="dialog" aria-labelledby="myModalLabel">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Request Leave</h4>
-                      </div>
-                      <div class="modal-body">
-
-                              <form id="eventForm" onsubmit="return false" class="form-horizontal" role="form">{% csrf_token %}
-                                    <div class="form-group">
-                                        <label class="col-md-3 control-label">Leave Type</label>
-                                          <div class="col-md-5">
-                                                <select class="form-control" id="leaveType" name="leaveType" required>
-                                                    <option>Annual Leave</option>
-                                                    <option>Sick Leave</option>
-                                                    <option>Parental Leave</option>
-                                                    <option>Compassionate Leave</option>
-                                                    <option>Leave in Lieu</option>
-                                                    <option>Other Leave</option>
-                                                </select>
-                                          </div>
-                                    </div>
-
-                                    <div class="form-group has-feedback">
-                                        <label for="start_date" class="col-md-3 control-label">Start Date</label>
-                                        <div class="col-md-5">
-                                            <div class="input-group input-append date" id="datePicker_1">
-                                                <input id="start_date" type="text" class="form-control" name="start_date" required pattern="^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$" placeholder="DD/MM/YYYY"/>
-                                                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-                                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group has-feedback">
-                                        <label for="startDateStartTime" class="col-md-3 control-label">Start Time</label>
-                                         <div class="col-md-5">
-                                             <select class="form-control" id="startDateStartTime" name="startDateStartTime">
-                                                <option>Beginning of Day</option>
-                                                <option>Lunchtime</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group has-feedback">
-                                        <label for="end_date" class="col-md-3 control-label">End Date</label>
-                                        <div class="col-md-5 date">
-                                            <div class="input-group input-append date" id="datePicker_2">
-                                                <input type="text" class="form-control" id="end_date" name="end_date"  placeholder="DD/MM/YYYY"/>
-                                                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-                                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group has-feedback">
-                                        <label for="endDateEndTime" class="col-md-3 control-label">End Time</label>
-                                        <div class="col-md-5">
-                                             <select class="form-control" id="endDateEndTime" name="endDateEndTime">
-                                                <option>End of Day</option>
-                                                <option>Lunchtime</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-md-3 control-label">Reason</label>
-                                          <div class="col-md-5">
-                                              <textarea class="form-control" rows="5" id="leaveReason" name="leaveReason"></textarea>
-                                          </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-md-3 control-label">Approval Type</label>
-                                          <div class="col-md-5">
-                                            <div class="radio">
-                                                <label><input type="radio" name="optradio" value="Manager">Manager</label>
-                                            </div>
-                                            <div class="radio">
-                                                <label><input type="radio" name="optradio" value="Team">Team</label>
-                                            </div>
-                                          </div>
-                                    </div>
-
-                                     <div class="form-group">
-                                        <div class="col-md-9 col-md-offset-3">
-                                            <div id="messages"/></div>
-                                        </div>
-                                     </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                        <button type="submit" id="submitButton" class="btn btn-primary" data_toggle="validator" >Submit</button>
-                                    </div>
-                            </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 {% endblock %}
 
 {% block scripts %}
@@ -151,7 +56,17 @@
 
 	    $.loader.open();
 
-		$('#calendar').fullCalendar({
+        initialiseCalendar();
+		getCalendarEvents();
+
+		getValidators();
+
+
+	});
+
+	function initialiseCalendar(){
+
+	    $('#calendar').fullCalendar({
 			header: {
 				left: 'prev,next today',
 				center: 'title',
@@ -159,16 +74,23 @@
 			},
 			editable: false,
 			eventLimit: true,
+			firstDay: 1,
+			eventClick: function(calEvent, jsEvent, view) {
+			    $("#eventLeaveTypeValue").html(calEvent.leaveType);
+			    $("#eventStartDateValue").html(calEvent.startDateString);
+			    $("#eventStartTimeValue").html(calEvent.startTime);
+			    $("#eventEndDateValue").html(calEvent.endDateString);
+			    $("#eventEndTimeValue").html(calEvent.endTime);
+			    $("#eventStatusValue").html(calEvent.leaveStatus);
+			    $("#eventReasonValue").html(calEvent.leaveReason);
+			    $('#eventDetailModal').modal('show');
+            }
 		});
-
-		getCalendarEvents();
-		getDatePickers();
-		getValidators();
-
-
-	});
+	}
 
 	function getCalendarEvents(){
+
+	    $('#calendar').fullCalendar('removeEvents');
 
         $.ajax({
             type: "GET",
@@ -190,6 +112,18 @@
                     var end_date = event_detail["end_date"];
                     var start_time = event_detail["start_time"];
                     var end_time = event_detail["end_time"];
+                    var leave_status = event_detail["leave_status"];
+                    var leave_reason = event_detail["leave_reason"];
+                    var fontColour = 'rgba(0, 0, 0)';
+
+                    start_date_string = new Date(start_date)
+                    start_date_string = start_date_string.toString("dd/MM/yyyy");
+
+                    end_date_string = new Date(end_date)
+                    end_date_string = end_date_string.toString("dd/MM/yyyy");
+
+                    var semiTransparentGreen = 'rgba(65, 150, 65, 0.3)';
+                    var semiTransparentWhite = 'rgba(255, 255, 255, 0.4)';
 
                     if (start_time == "Lunchtime"){
 
@@ -197,7 +131,7 @@
                         start_date_test = $.fullCalendar.moment(start_date.concat(' 13:00'));
                         }else{
                             start_date_test = start_date;
-                        }
+                    }
 
                     if (end_time == "Lunchtime"){
                         all_day = false;
@@ -208,23 +142,15 @@
 
                     var backgroundColourOfEvent = "";
 
-                    if(leave_type == "Annual Leave"){
+                    if(leave_status == "Approved"){
                         backgroundColourOfEvent = 'green';
                     }
-                    else if(leave_type == "Sick Leave"){
+                    else if(leave_status == "Declined"){
                         backgroundColourOfEvent = '#ED1317';
                     }
-                    else if(leave_type == "Compassionate Leave"){
-                        backgroundColourOfEvent = 'black';
-                    }
-                    else if(leave_type == "Parental Leave"){
-                        backgroundColourOfEvent = 'yellow';
-                    }
-                    else if(leave_type == "Leave in Lieu"){
-                        backgroundColourOfEvent = 'orange';
-                    }
-                    else if(leave_type == "Other Leave"){
-                        backgroundColourOfEvent = 'blue';
+                    else if(leave_status == "Pending"){
+                        backgroundColourOfEvent = semiTransparentGreen;
+                        fontColour = semiTransparentWhite;
                     }
 
                     var myEvent = {
@@ -232,7 +158,17 @@
                           allDay: all_day,
                           start: start_date_test,
                           end: end_date_test,
-                          backgroundColor: backgroundColourOfEvent
+                          backgroundColor: backgroundColourOfEvent,
+                          eventColor: backgroundColourOfEvent,
+                          borderColor: backgroundColourOfEvent,
+                          textColor: fontColour,
+                          leaveReason: leave_reason,
+                          leaveStatus: leave_status,
+                          endTime: end_time,
+                          startTime: start_time,
+                          leaveType: leave_type,
+                          startDateString: start_date_string,
+                          endDateString: end_date_string
                         };
 
                     $('#calendar').fullCalendar( 'renderEvent', myEvent, true );
@@ -246,274 +182,179 @@
 
 	}
 
-	function getDatePickers(){
-	    var today = new Date();
-        var dd = today.getDate();
-
-       $('#start_date').daterangepicker({
-            "singleDatePicker": true,
-            "locale": {
-                "format": "DD/MM/YYYY",
-                "separator": " - ",
-                "applyLabel": "Apply",
-                "cancelLabel": "Cancel",
-                "fromLabel": "From",
-                "toLabel": "To",
-                "customRangeLabel": "Custom",
-                "daysOfWeek": [
-                    "Su",
-                    "Mo",
-                    "Tu",
-                    "We",
-                    "Th",
-                    "Fr",
-                    "Sa"
-                ],
-                "monthNames": [
-                    "January",
-                    "February",
-                    "March",
-                    "April",
-                    "May",
-                    "June",
-                    "July",
-                    "August",
-                    "September",
-                    "October",
-                    "November",
-                    "December"
-                ],
-                "firstDay": 1
-            },
-            "startDate": dd
-        });
-
-        $('#end_date').daterangepicker({
-            "singleDatePicker": true,
-            "locale": {
-                "format": "DD/MM/YYYY",
-                "separator": " - ",
-                "applyLabel": "Apply",
-                "cancelLabel": "Cancel",
-                "fromLabel": "From",
-                "toLabel": "To",
-                "customRangeLabel": "Custom",
-                "daysOfWeek": [
-                    "Su",
-                    "Mo",
-                    "Tu",
-                    "We",
-                    "Th",
-                    "Fr",
-                    "Sa"
-                ],
-                "monthNames": [
-                    "January",
-                    "February",
-                    "March",
-                    "April",
-                    "May",
-                    "June",
-                    "July",
-                    "August",
-                    "September",
-                    "October",
-                    "November",
-                    "December"
-                ],
-                "firstDay": 1
-            },
-            "startDate": dd
-        });
-	}
-
 	function getValidators(){
-	            $('#eventForm').bootstrapValidator({
-        framework: 'bootstrap',
-        button: {
-            selector: '#submitButton',
-        },
-        container: '#messages',
-        live: 'enabled',
-        feedbackIcons: {
-            valid: 'glyphicon glyphicon-ok',
-            invalid: 'glyphicon glyphicon-remove',
-            validating: 'glyphicon glyphicon-refresh'
-        },
-        fields: {
-            start_date: {
-                validators: {
-                    notEmpty: {
-                        message: 'The start date is required and cannot be empty'
-                    }
-                }
+        $('#eventForm').formValidation({
+            framework: 'bootstrap',
+            button: {
+                selector: '#submitButton',
             },
-            startDateStartTime: {
-                validators: {
-                    notEmpty: {
-                        message: 'The start date is required and cannot be empty'
-                    },
-                    callback: {
-                        callback: function (value, validator, $field) {
+            container: '#messages',
+            live: 'enabled',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                start_date: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The start date is required and cannot be empty'
+                        },
 
-                            var startDate = $("#start_date").val();
-                            var endDate = $("#end_date").val();
-                            var endDateTime = $("#endDateEndTime").val();
-                            var startDateTime = $("#startDateStartTime").val();
+                        date: {
+                            format: 'DD/MM/YYYY',
+                            message: 'The value is not a valid date',
+                            max: 'end_date'
+                        },
 
-                            startDate = new Date(startDate);
-                            endDate = new Date(endDate);
+                    }
+                },
+                startDateStartTime: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The start time is required and cannot be empty'
+                        },
+                        callback: {
+                            callback: function (value, validator, $field) {
 
-                            if (startDate == endDate){
-                                alert("dates are the same");
-                                if(endDateTime == "Lunchtime" && startDateTime == "Lunchtime"){
-                                   alert("same date and both equal lunchtime");
+                                var startDate = $("#start_date").val();
+                                var endDate = $("#end_date").val();
+                                var endDateTime = $("#endDateEndTime").val();
+                                var startDateTime = $("#startDateStartTime").val();
+
+                                startDate = new Date(startDate);
+                                endDate = new Date(endDate);
+
+                                if (startDate == endDate){
+                                    if(endDateTime == "Lunchtime" && startDateTime == "Lunchtime"){
+                                            return {
+                                                valid: false,
+                                            }
+                                    }
+                                    else {
                                         return {
-                                            valid: false,
-                                            message: 'Leave cannot start and finish at the same time on the same day.'
-                                        }
+                                                valid: true
+                                            }
+                                    }
                                 }
-                                else {
+                                else{
                                     return {
-                                            valid: true
-                                        }
-                                }
-                            }
-                            else{
-                                return {
-                                            valid: true
-                                        }
-                            }
-                        }
-                    }
-                }
-            },
-            end_date: {
-                validators: {
-                    notEmpty: {
-                        message: 'The end date is required and cannot be empty'
-                    },
-                    callback: {
-                        callback: function (value, validator, $field) {
-
-                            var startDate = $("#start_date").val();
-                            var endDate = $("#end_date").val();
-
-                            //alert("start Date " + startDate);
-                            //alert("end Date " + endDate);
-
-                            //alert("start Date " + Date.parse(startDate));
-                            //alert("end Date " + Date.parse(endDate));
-
-
-                            if (endDate <= startDate){
-                                //alert("end date less than start date");
-                                return {
-                                            valid: false,
-                                            message: 'Start date has to be earlier than or equal to the end date'
-                                        }
-                            }
-                            else {
-                                //alert("date is fine now");
-                                return {
-                                    valid: true
+                                                valid: true
+                                            }
                                 }
                             }
                         }
                     }
-                }
-            },
-            endDateEndTime: {
-                validators: {
-                    notEmpty: {
-                        message: 'The end time is required and cannot be empty'
-                    },
-                    callback: {
-                        callback: function (value, validator, $field) {
+                },
+                end_date: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The end date is required and cannot be empty'
+                        },
 
-                            var startDate = $("#start_date").val();
-                            var endDate = $("#end_date").val();
-                            var endDateTime = $("#endDateEndTime").val();
-                            var startDateTime = $("#startDateStartTime").val();
+                        date: {
+                            format: 'DD/MM/YYYY',
+                            message: 'The value is not a valid date',
+                            min: 'start_date'
 
-                            startDate = new Date(startDate);
-                            endDate = new Date(endDate);
+                        }
+                    }
+                },
+                endDateEndTime: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The end time is required and cannot be empty'
+                        },
+                        callback: {
+                            message: "Leave cannot start and finish at the same time on the same day.",
+                            callback: function (value, validator, $field) {
 
-                            if (startDate == endDate){
-                                alert("dates are the same");
-                                if(endDateTime == "Lunchtime" && startDateTime == "Lunchtime"){
-                                   alert("same date and both equal lunchtime");
-                                        return {
-                                            valid: false,
-                                            message: 'Leave cannot start and finish at the same time on the same day.'
-                                        }
+                                var endDateTime = $("#endDateEndTime").val();
+                                var startDateTime = $("#startDateStartTime").val();
+
+                                var start_date = ($("#start_date").val());
+                                var end_date = ($("#end_date").val());
+
+                                var momentDate = moment(start_date, 'DD/MM/YYYY');
+                                var momentDate1 = moment(end_date, 'DD/MM/YYYY');
+
+                                startDate = new Date(momentDate);
+                                endDate = new Date(momentDate1);
+
+                                console.log("Start Date: " + startDate);
+                                console.log("End Date: " + endDate);
+                                console.log(startDate.valueOf() == endDate.valueOf());
+
+                                if (startDate.valueOf() === endDate.valueOf()) {
+                                    if(endDateTime == "Lunchtime" && startDateTime == "Lunchtime"){
+                                            return false;
+                                    }
+                                    else{
+                                        return true;
+                                    }
+
+                                } else {
+                                   return true;
                                 }
-                                else {
-                                    return {
-                                            valid: true
-                                        }
-                                }
-                            }
-                            else{
-                                return {
-                                            valid: true
-                                        }
                             }
                         }
                     }
-                }
-            },
-            leaveReason: {
-                validators: {
-                    stringLength: {
-                        max: 300,
-                        message: 'The Reason must be less than 300 characters long'
+                },
+                leaveReason: {
+                    validators: {
+                        stringLength: {
+                            max: 300,
+                            message: 'The Reason must be less than 300 characters long'
+                        }
                     }
-                }
-            },
-            leaveType: {
-                validators: {
-                    notEmpty: {
-                        message: 'The type of leave is required and cannot be empty'
-                    },
-                    stringLength: {
-                        max: 70,
-                        message: 'The leave type must be less than 70 characters long'
+                },
+                leaveType: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The type of leave is required and cannot be empty'
+                        },
+                        stringLength: {
+                            max: 70,
+                            message: 'The leave type must be less than 70 characters long'
+                        }
                     }
-                }
+                },
+                optradio: {
+                    validators: {
+                        notEmpty: {
+                            message: 'The content is required and cannot be empty'
+                        },
+                    }
+                },
             },
-            optradio: {
-                validators: {
-                    notEmpty: {
-                        message: 'The content is required and cannot be empty'
-                    },
-                }
-            },
-        },
 
-    })
-    .on('init.form.bv', function(e, data) {
-        alert("IM GETTING IN INITIALISE FORM");
-        validator.disableSubmitButtons(false);
-    })
-    .on('success.form.bv', function(e, data) {
-        // Prevent form submission
-        e.preventDefault();
+        })
+        .on('success.form.fv', function(e, data) {
 
-        var $form        = $(e.target),
-            validator    = $form.data('bootstrapValidator'),
-            submitButton = validator.getSubmitButton();
+            var $form        = $(e.target),
+                validator    = $form.data('formValidation'),
+                submitButton = validator.getSubmitButton()
 
+            validator.disableSubmitButtons(true);
 
-        validator.disableSubmitButtons(true);
+            sendLeaveRequest();
+            validator.resetForm();
+            validator.disableSubmitButtons(true);
 
-        sendLeaveRequest();
-    })
-    .on('err.form.bv', function(e, data) {
-         alert("Finding errors in the form");
-         $(form).data('formValidation').resetForm();
-    });
-	}
+        })
+        .on('err.form.fv', function(e, data) {
+        });
+    }
+
+       $('#eventForm input').on('keyup blur', function () { // fires on every keyup & blur          // checks form for validity
+                $('submitButton').prop('disabled', false);        // enables button
+              $('#eventForm')
+                .formValidation('revalidateField', 'start_date')
+               .formValidation('revalidateField', 'end_date')
+                .formValidation('revalidateField', 'endDateEndTime')
+                .formValidation('revalidateField', 'startDateStartTime');
+        });
 
 	function sendLeaveRequest(){
 
@@ -540,7 +381,8 @@
                 },
 
                 beforeSend: function(data){
-
+                    $('#requestLeaveModal').modal('hide');
+                    $.loader.open();
                 },
 
                 success: function(data){
@@ -551,6 +393,8 @@
 
                             var reasonValue =  document.getElementById("ReasonValue");
                             reasonValue.innerHTML = data[1];
+
+                            $.loader.close();
                         }
                         else {
                             $('#requestLeaveModal').modal('hide');
@@ -573,6 +417,12 @@
 
                             var leaveReasonValue =  document.getElementById("leaveReasonValue");
                             leaveReasonValue.innerHTML = leave_reason;
+
+                            $.loader.close();
+
+                            $.loader.open();
+
+                            getCalendarEvents();
                         }
                 },
 

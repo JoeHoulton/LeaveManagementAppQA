@@ -5,43 +5,38 @@
     {% load static %}
     <script src="{% get_static_prefix %}/jquery.min.js"></script>
 
+    <!--Bootstrap Files-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+    <!--Main CSS File-->
     <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}/main.css" />
 
     {% block head_elements %}{% endblock %}
 </head>
 
-<nav class="navbar navbar-default">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="/calendar">
-            {% load static %}
-            <img src="{% get_static_prefix %}/Logo_Designs_3_Nav_Bar.png" alt="LeaveCal Logo"/>
-          </a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-            <li><p align="center">Leave Request</p></li>
-          </ul>
-        </div>
-    </div>
-</nav>
-
 <body>
-    {% block content %}
-
-    {% endblock %}
-
+    <!--Table for Layout within Emails-->
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td align="center">
+                <a href="http://josephhoulton.pythonanywhere.com/dashboard"><img src="http://josephhoulton.pythonanywhere.com/static/Logo_Designs_Small.png" alt="LeaveCal Logo" align="center" border="0"/></a>
+            </td>
+        </tr>
+    </table>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td align="center">
+                {% block content %}
+                {% endblock %}
+            </td>
+        </tr>
+    </table>
 </body>
 <footer>
-        <div class="navbar  navbar-default nav navbar-fixed-bottom">
-            <div class="container">
-                <p align="center">LeaveCal | Copyright 2015</p>
-            </div>
-        </div>
+    <div class="footer">
+        <p align="center" class="text-muted">LeaveCal | Copyright 2015</p>
+    </div>
     {% block scripts %}{% endblock %}
 </footer>

@@ -5,10 +5,12 @@
 .navbar .navbar-nav {
     display: inline-block;
     float: none;
+    height:28px !important;
 }
 
 .navbar .navbar-collapse {
     text-align: center;
+    padding-right: 5px;
 }
 
 body {
@@ -17,11 +19,24 @@ body {
         padding-top: 80px
      }
 
+a[class="dropdown-toggle"] {
+    height: 42px;
+    margin-top: 10px;
+    float: none;
+    display: inline-block;
+}
+
 .navbar-brand,
 .navbar-nav li a {
-    line-height: 75px;
     height: 80px;
-    padding-top: 5px;
+    padding-top: 0px;
+    float: none;
+    display: inline-block;
+}
+.navbar-nav li h3 {
+    line-height: 20px;
+    height: 30px;
+    padding-top: 10px;
     float: none;
     display: inline-block;
 }
@@ -30,12 +45,20 @@ body {
     max-width: 100px;
 }
 
+.glyphicon.glyphicon-user{
+    color: rgb(127, 127, 127);
+}
+
 .navbar-brand{
     position: absolute;
     width: 100%;
     left: 0;
     text-align: center;
     margin: auto;
+}
+
+#bradford_factor_explanation_text{
+    color:white;
 }
 
 #login_content {
@@ -67,11 +90,15 @@ body {
     background-color: rgb(127, 140, 141);
     color: white;
 }
+#user_text{
+    color: rgb(127, 127, 127);
+}
 
 #calendar_container_two, #dashboard_container_calendar {
     border-style: none;
     background-color: rgb(255, 0, 102);
     color: white;
+    padding-bottom: 20px;
 }
 .progress-bar[aria-valuenow="0"] {
   color: black;
@@ -88,9 +115,6 @@ h1,h2{
     font-family: 'Titillium Web', sans-serif;
     font-size: 100px;
 
-}
-.navbar-right{
-    float:right;
 }
 
 .form-control {
@@ -113,6 +137,14 @@ h1,h2{
  #nav_logo {
      padding-top: 4px;
      padding-left: 2px;
+     text-decoration:none;
+ }
+
+ #container_padding {
+     margin-top: 4px;
+     margin-left: 10px;
+     margin-right: 10px;
+     margin-bottom: 10px;
  }
 
 #footer {
@@ -143,24 +175,32 @@ h1,h2{
     /* Negative indent footer by it's height */
     margin: 0 auto -60px;
 }
+#logo_text {
+    padding-top:0;
+    padding-bottom:0;
+    margin: 0px;
+    color: rgb(127,127,127);
+}
+
+#logo_text :hover
+{
+  text-decoration:none;
+}
 
 .modal{
     position: absolute;
 }
+.modal-body {
+    overflow-y:visible;
+}
+
+#postSubmissionModal {
+    position: absolute;
+
+}
 
 td{
   text-align: center
-}
-
-
-
-@media (max-width: 767px) {
-#footer, #calendar_container_two {
-  margin-left: -20px;
-  margin-right: -20px;
-  padding-left: 20px;
-  padding-right: 20px;
-    }
 }
 
 .button-padding{
@@ -170,13 +210,61 @@ td{
     padding-bottom: 10px;
 
 }
+
 .button-padding-table{
     padding-left: 2px;
     padding-right: 2px;
     padding-top: 2px;
     padding-bottom: 2px;
-
 }
+
+.button-padding-approve-leave{
+    margin-right: 10px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.rectangle-approved {
+   background: green;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+   -o-box-shadow: none;
+   box-shadow: none;
+   border-radius: 0px;
+   margin-left: 0px !important;
+   border: none;
+   height: 20px;
+   width:100%;
+
+ }
+ .rectangle-declined {
+   background: #ED1317;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+   -o-box-shadow: none;
+   box-shadow: none;
+   border-radius: 0px;
+   margin-left: 0px !important;
+   border: none;
+   height: 20px;
+   width:100%;
+
+ }
+ .rectangle-pending {
+   background: rgba(65, 150, 65, 0.3);
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+   -o-box-shadow: none;
+   box-shadow: none;
+   border-radius: 0px;
+   margin-left: 0px !important;
+   border: none;
+   height: 20px;
+   width:100%;
+
+ }
 
 @media (max-width: 480px) {
 
@@ -185,6 +273,10 @@ body, #footer, #calendar_container_two, {
   margin-right: -20px;
   padding-left: 20px;
   padding-right: 20px;
+    }
+
+.modal{
+    position: fixed;
     }
 }
 
@@ -200,18 +292,32 @@ hr {
     border: 0 none;
     width: 80%;
 }
+
+.fc-event{
+    cursor: pointer;
+}
+
 @media (min-width: 768px) {
     .navbar .navbar-nav {
         display: inline-block;
         float: none;
         vertical-align: top;
     }
+    .modal{
+    position: fixed;
+    }
 
     .navbar .navbar-collapse {
-        max-width: 80%;
+        max-width: 100%;
     }
     .navbar-brand {
         text-align: center;
+    }
+    #footer, #calendar_container_two {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
     }
 }
 

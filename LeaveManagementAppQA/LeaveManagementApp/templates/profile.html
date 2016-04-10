@@ -1,34 +1,58 @@
 <!DOCTYPE html>
 {% extends "base_file.html" %}
 {% block title %}LeaveCal - Profile{% endblock %}
+{% block username_to_display %}{{ username }}{% endblock %}
 {% block content %}
+
+        <!--Title Div-->
         <div class="row">
             <div class="col-md-12">
                 <h1 id="login_content" name="profile_title" align="center">PROFILE</h1>
             </div>
         </div>
 
+        <!--Personal Information Container-->
         <div class="row">
-            <div class="col-md-4 col-xs-10 col-md-offset-1 col-xs-offset-1 panel panel-default" id="dasbboard_container_one">
+            <div class="col-md-4 col-xs-10 col-md-offset-1 col-xs-offset-1 panel panel-default" id="profile_container_one">
                 <h2 align="center">Personal Information</h2>
                 <div class="panel-group">
                     <h4>First Name</h4>
-                    <div class="progress">
-                        {{ first_name }}
-                    </div>
+                        <h3 align="center">{{ first_name }}</h3>
                     <h4>Last Name</h4>
-                    <div class="progress">
-                        {{ last_name }}
-                    </div>
+                        <h3 align="center">{{ last_name }}</h3>
                     <h4>Username</h4>
-                    <div class="progress">
-                        {{ username }}
-                    </div>
+                        <h3 align="center">{{ username }}</h3>
                     <h4>Email</h4>
+                        <h3 align="center">{{ email }}</h3>
+                </div>
+            </div>
+
+            <!--Leave Information Container-->
+            <div class="col-md-4 col-xs-10 col-md-offset-2 col-xs-offset-1 panel panel-default" id="profile_container_two">
+                <h2 align="center">Leave Information</h2>
+                <div class="panel-group">
+                    <h4>Leave Entitlement</h4>
+                    <h3 align="center" id="leave_entitlement"></h3>
+                    <h4>Leave Remaining</h4>
                     <div class="progress">
-                        {{ email }}
+                        <div class="progress-bar progress-bar-striped" id="leave_remaining" role="progressbar"
+                          aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" style="width:0%">
+                        </div>
                     </div>
-                    <h4>Addresses</h4>
+                    <h4>Leave Used</h4>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped"  id="leave_used" role="progressbar"
+                          aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" style="width:0%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-xs-10 col-md-offset-1 col-xs-offset-1 panel panel-default" id="profile_container_four">
+                <h2 align="center">Addresses</h2>
+                <div class="panel-group">
                     <div class="tabbable">
                         <ul class="nav nav-tabs" id="address_tabs">
                         </ul>
@@ -38,27 +62,44 @@
                 </div>
             </div>
 
-            <div class="col-md-4 col-xs-10 col-md-offset-2 col-xs-offset-1 panel panel-default" id="dasbboard_container_one">
-                <h2 align="center">Leave Information</h2>
+            <!--Organisation and Team Information Container-->
+            <div class="col-md-4 col-xs-10 col-md-offset-2 col-xs-offset-1 panel panel-default" id="profile_container_three">
+                <h2 align="center">Organisation Information</h2>
                 <div class="panel-group">
-                    <h4>Leave Entitlement</h4>
-                    <h3 align="center" id="leave_entitlement"></h3>
-                    <h4>Used</h4>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped"  id="leave_used" role="progressbar"
-                          aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" style="width:0%">
-                        </div>
-                    </div>
-                    <h4>Remaining</h4>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped" id="leave_remaining" role="progressbar"
-                          aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" style="width:0%">
-                        </div>
-                    </div>
+                    <h4>Organisation Name</h4>
+                    <h3 align="center" id="organisation_name_value"></h3>
+                    <h4>Team Name</h4>
+                     <h3 align="center" id="team_name_value"></h3>
                 </div>
             </div>
             <div class="col-xs-1">
             </div>
+        </div>
+
+        <!-- Modal After address update successful-->
+        <div class="modal fade" id="postUpdateAddressModal" tabindex="-1" role="dialog" aria-labelledby="modalLabelPostUpdateAddress">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalLabelPostUpdateAddress">Profile</h4>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 id= "addressUpdatedText">
+                            Address has been updated
+                        </h4>
+                    </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+            </div>
+          </div>
         </div>
 
 {% endblock %}
@@ -66,160 +107,21 @@
 {% block scripts %}
 <script>
     $(document).ready(function() {
-        $.ajax({
-                type: "GET",
-                url: "/account/addresses/",
-                success: function(data){
-                    $.each(JSON.parse(data), function(i, event_detail){
 
-                        //ADDRESS HTML CREATION USING DOM
+        getAddresses();
+        getLeaveDetails();
+        getOrganisationAndTeam();
 
-                        var current_address = document.createElement("LI");
-
-                        var is_active_tab_first = "active";
-
-                        if(i == 0){
-                            is_active_tab_first = "";
-                            var att = document.createAttribute("class");
-                            att.value = "active";
-                            current_address.setAttributeNode(att);
-                        }
-
-                        var link = document.createElement("A");
-                        var href = document.createAttribute("href");
-                        href.value = ("#" + "address" + i);
-                        var data_toggle = document.createAttribute("data-toggle");
-                        data_toggle.value = ("tab");
-
-                        link.setAttributeNode(href);
-                        link.setAttributeNode(data_toggle);
-                        link.innerHTML = event_detail["address_name"];
-
-                        current_address.appendChild(link);
-
-                        document.getElementById("address_tabs").appendChild(current_address);
-
-                        var is_active_tab_second = " active";
-
-                        if(i != 0){
-                            is_active_tab_second = "";
-                        }
-
-                        var div = document.createElement('div');
-                        var class_att = document.createAttribute("class");
-                        class_att.value = ("tab-pane" + is_active_tab_second);
-                        var att_id = document.createAttribute("id");
-                        att_id.value = ("address" + i)
-
-                        div.setAttributeNode(class_att);
-                        div.setAttributeNode(att_id);
-
-
-                        var current_address_form = document.createElement("form");
-
-                        var house_name_div = document.createElement("div");
-                        house_name_div.setAttribute("class", "form-group");
-
-                        var house_name_label = document.createElement("LABEL");
-                        house_name_label.innerHTML = "House Name/Number";
-
-                        var house_name = document.createElement("input");
-                        house_name.setAttribute('type',"text");
-                        house_name.setAttribute('value',event_detail["house_name"]);
-                        house_name.setAttribute('class', "form-control");
-
-                        house_name_div.appendChild(house_name_label);
-                        house_name_div.appendChild(house_name);
-
-                        var address_1_div = document.createElement("div");
-                        address_1_div.setAttribute("class", "form-group");
-
-                        var address_1_label = document.createElement("LABEL");
-                        address_1_label.innerHTML = "Address 1";
-
-                        var address_1 = document.createElement("input");
-                        address_1.setAttribute('type',"text");
-                        address_1.setAttribute('value',event_detail["address_1"]);
-                        address_1.setAttribute('class', "form-control");
-
-                        address_1_div.appendChild(address_1_label);
-                        address_1_div.appendChild(address_1);
-
-                        var address_2_div = document.createElement("div");
-                        address_2_div.setAttribute("class", "form-group");
-
-                        var address_2_label = document.createElement("LABEL");
-                        address_2_label.innerHTML = "Address 2";
-
-                        var address_2 = document.createElement("input");
-                        address_2.setAttribute('type',"text");
-                        address_2.setAttribute('value',event_detail["address_2"]);
-                        address_2.setAttribute('class', "form-control");
-
-                        address_2_div.appendChild(address_2_label);
-                        address_2_div.appendChild(address_2);
-
-                        var city_div = document.createElement("div");
-                        city_div.setAttribute("class", "form-group");
-
-                        var city_label = document.createElement("LABEL");
-                        city_label.innerHTML = "City";
-
-                        var city = document.createElement("input");
-                        city.setAttribute('type',"text");
-                        city.setAttribute('value',event_detail["city"]);
-                        city.setAttribute('class', "form-control");
-
-                        city_div.appendChild(city_label);
-                        city_div.appendChild(city);
-
-                        var county_div = document.createElement("div");
-                        county_div.setAttribute("class", "form-group");
-
-                        var county_label = document.createElement("LABEL");
-                        county_label.innerHTML = "County";
-
-                        var county = document.createElement("input");
-                        county.setAttribute('type',"text");
-                        county.setAttribute('value',event_detail["county"]);
-                        county.setAttribute('class', "form-control");
-
-                        county_div.appendChild(county_label);
-                        county_div.appendChild(county);
-
-                        var postcode_div = document.createElement("div");
-                        postcode_div.setAttribute("class", "form-group");
-
-                        var postcode_label = document.createElement("LABEL");
-                        postcode_label.innerHTML = "Postcode";
-
-                        var postcode = document.createElement("input");
-                        postcode.setAttribute('type',"text");
-                        postcode.setAttribute('value',event_detail["postcode"]);
-                        postcode.setAttribute('class', "form-control");
-
-                        postcode_div.appendChild(postcode_label);
-                        postcode_div.appendChild(postcode);
-
-                        current_address_form.appendChild(house_name_div);
-                        current_address_form.appendChild(address_1_div);
-                        current_address_form.appendChild(address_2_div);
-                        current_address_form.appendChild(city_div);
-                        current_address_form.appendChild(county_div);
-                        current_address_form.appendChild(postcode_div);
-
-                        div.appendChild(current_address_form);
-
-                        document.getElementById("address_fields").appendChild(div);
-
-                    });
-            }
-        });
     });
-    $(document).ready(function() {
+
+    function getLeaveDetails(){
+
         $.ajax({
                 type: "GET",
                 url: "/account/leavedetails/",
+                beforeSend: function(data){
+                    $.loader.open();
+                },
                 success: function(data){
                     $.each(JSON.parse(data), function(i, event_detail){
 
@@ -281,9 +183,253 @@
                         }
 
                     });
+            },
+            complete : function (){
             }
         });
-    });
+    }
+
+    function getAddresses(){
+        $.ajax({
+                type: "GET",
+                url: "/account/addresses/",
+                beforeSend: function(data){
+                },
+                success: function(data){
+                    $.each(JSON.parse(data), function(i, event_detail){
+
+                        //ADDRESS HTML CREATION USING DOM
+
+                        var current_address = document.createElement("LI");
+
+                        var is_active_tab_first = "active";
+
+                        if(i == 0){
+                            is_active_tab_first = "";
+                            var att = document.createAttribute("class");
+                            att.value = "active";
+                            current_address.setAttributeNode(att);
+                        }
+
+                        var link = document.createElement("A");
+                        var href = document.createAttribute("href");
+                        href.value = ("#" + "address" + i);
+                        var data_toggle = document.createAttribute("data-toggle");
+                        data_toggle.value = ("tab");
+
+                        link.setAttributeNode(href);
+                        link.setAttributeNode(data_toggle);
+                        link.innerHTML = event_detail["address_name"];
+
+                        current_address.appendChild(link);
+
+                        document.getElementById("address_tabs").appendChild(current_address);
+
+                        var is_active_tab_second = " active";
+
+                        if(i != 0){
+                            is_active_tab_second = "";
+                        }
+
+                        var div = document.createElement('div');
+                        var class_att = document.createAttribute("class");
+                        class_att.value = ("tab-pane" + is_active_tab_second);
+                        var att_id = document.createAttribute("id");
+                        att_id.value = ("address" + i)
+
+                        div.setAttributeNode(class_att);
+                        div.setAttributeNode(att_id);
+
+                        var current_address_form = document.createElement("form");
+                        current_address_form.setAttribute("address_id", event_detail["address_id"]);
+                        current_address_form.setAttribute('onsubmit',"return false;");
+
+                        var house_name_div = document.createElement("div");
+                        house_name_div.setAttribute("class", "form-group");
+
+                        var house_name_label = document.createElement("LABEL");
+                        house_name_label.innerHTML = "House Name/Number";
+
+                        var house_name = document.createElement("input");
+                        house_name.setAttribute('type',"text");
+                        house_name.setAttribute('value',event_detail["house_name"]);
+                        house_name.setAttribute('class', "form-control");
+                        house_name.setAttribute("address_id", ("house_name" + "_" + event_detail["address_id"]));
+
+                        house_name_div.appendChild(house_name_label);
+                        house_name_div.appendChild(house_name);
+
+                        var address_1_div = document.createElement("div");
+                        address_1_div.setAttribute("class", "form-group");
+
+
+                        var address_1_label = document.createElement("LABEL");
+                        address_1_label.innerHTML = "Address 1";
+
+                        var address_1 = document.createElement("input");
+                        address_1.setAttribute('type',"text");
+                        address_1.setAttribute('value',event_detail["address_1"]);
+                        address_1.setAttribute('class', "form-control");
+                        address_1.setAttribute("address_id", ("address_1" + "_" + event_detail["address_id"]));
+
+                        address_1_div.appendChild(address_1_label);
+                        address_1_div.appendChild(address_1);
+
+                        var address_2_div = document.createElement("div");
+                        address_2_div.setAttribute("class", "form-group");
+
+                        var address_2_label = document.createElement("LABEL");
+                        address_2_label.innerHTML = "Address 2";
+
+                        var address_2 = document.createElement("input");
+                        address_2.setAttribute('type',"text");
+                        address_2.setAttribute('value',event_detail["address_2"]);
+                        address_2.setAttribute('class', "form-control");
+                        address_2.setAttribute("address_id", ("address_2" + "_" + event_detail["address_id"]));
+
+                        address_2_div.appendChild(address_2_label);
+                        address_2_div.appendChild(address_2);
+
+                        var city_div = document.createElement("div");
+                        city_div.setAttribute("class", "form-group");
+
+                        var city_label = document.createElement("LABEL");
+                        city_label.innerHTML = "City";
+
+                        var city = document.createElement("input");
+                        city.setAttribute('type',"text");
+                        city.setAttribute('value',event_detail["city"]);
+                        city.setAttribute('class', "form-control");
+                        city.setAttribute("address_id", ("city" + "_" + event_detail["address_id"]));
+
+                        city_div.appendChild(city_label);
+                        city_div.appendChild(city);
+
+                        var county_div = document.createElement("div");
+                        county_div.setAttribute("class", "form-group");
+
+                        var county_label = document.createElement("LABEL");
+                        county_label.innerHTML = "County";
+
+                        var county = document.createElement("input");
+                        county.setAttribute('type',"text");
+                        county.setAttribute('value',event_detail["county"]);
+                        county.setAttribute('class', "form-control");
+                        county.setAttribute("address_id", ("county" + "_" + event_detail["address_id"]));
+
+                        county_div.appendChild(county_label);
+                        county_div.appendChild(county);
+
+                        var postcode_div = document.createElement("div");
+                        postcode_div.setAttribute("class", "form-group");
+
+                        var postcode_label = document.createElement("LABEL");
+                        postcode_label.innerHTML = "Postcode";
+
+                        var postcode = document.createElement("input");
+                        postcode.setAttribute('type',"text");
+                        postcode.setAttribute('value',event_detail["postcode"]);
+                        postcode.setAttribute('class', "form-control");
+                        postcode.setAttribute("address_id", ("postcode" + "_" + event_detail["address_id"]));
+
+                        postcode_div.appendChild(postcode_label);
+                        postcode_div.appendChild(postcode);
+
+                        var save_button = document.createElement("input");
+
+                        save_button.setAttribute('onClick',"editAddress(this);");
+                        save_button.setAttribute('type',"button");
+                        save_button.setAttribute('id',("save_button"));
+                        save_button.setAttribute('value',"Save");
+                        save_button.setAttribute('class',"btn btn-success");
+                        save_button.setAttribute('name',"cancel_button");
+
+                        current_address_form.appendChild(house_name_div);
+                        current_address_form.appendChild(address_1_div);
+                        current_address_form.appendChild(address_2_div);
+                        current_address_form.appendChild(city_div);
+                        current_address_form.appendChild(county_div);
+                        current_address_form.appendChild(postcode_div);
+                        current_address_form.appendChild(save_button);
+
+                        div.appendChild(current_address_form);
+
+                        document.getElementById("address_fields").appendChild(div);
+
+                    });
+            },
+            complete : function (){
+            }
+        });
+    }
+
+    function getOrganisationAndTeam(){
+        $.ajax({
+                type: "GET",
+                url: "/account/organisationinformation/",
+                beforeSend: function(data){
+                },
+                success: function(data){
+                    $.each(JSON.parse(data), function(i, event_detail){
+
+                        document.getElementById("organisation_name_value").innerHTML = event_detail["organisation_name"]
+                        document.getElementById("team_name_value").innerHTML = event_detail["team_name"]
+
+                    });
+                },
+                complete : function (){
+                    $.loader.close();
+                }
+            });
+    }
+
+    function editAddress(calling_element){
+
+        //var current_leave_id = document.getElementById(calling_element.id).getAttribute("leave_id");
+        //var current_name = document.getElementById(calling_element.id).getAttribute("name");
+
+        var form_element = $(calling_element).parent();
+
+        var address_id_value = form_element.attr('address_id');
+
+        var house_name_number_value = form_element.find("input" + "[" + "address_id" + "=" + 'house_name_' + address_id_value + "]").val();
+        var address_1_value = form_element.find("input" + "[" + "address_id" + "=" + 'address_1_' + address_id_value + "]").val();
+        var address_2_value = form_element.find("input" + "[" + "address_id" + "=" + 'address_2_' + address_id_value + "]").val();
+        var city_value = form_element.find("input" + "[" + "address_id" + "=" + 'city_' + address_id_value + "]").val();
+        var county_value = form_element.find("input" + "[" + "address_id" + "=" + 'county_' + address_id_value + "]").val();
+        var postcode_value = form_element.find("input" + "[" + "address_id" + "=" + 'postcode_' + address_id_value + "]").val();
+
+        $.ajax({
+                type: "POST",
+                url: "/account/editaddress/",
+                async: true,
+                data: {
+                    address_id: address_id_value,
+                    house_name: house_name_number_value,
+                    address_1: address_1_value,
+                    address_2: address_2_value,
+                    city: city_value,
+                    county: county_value,
+                    postcode: postcode_value
+                },
+
+                beforeSend: function(data){
+                    $.loader.open();
+                },
+
+                success: function(data){
+                    $.loader.close();
+
+                    $('#postUpdateAddressModal').modal('show');
+                },
+
+                failure: function(response, opts) {
+                    console.log('server-side failure: ' + response);
+                },
+        });
+    }
+
+
 </script>
 
 {% endblock %}

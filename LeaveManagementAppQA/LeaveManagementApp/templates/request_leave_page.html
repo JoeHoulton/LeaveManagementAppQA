@@ -3,14 +3,17 @@
         {% block title %}LeaveCal - Approve Leave{% endblock %}
 
         {% block leave_requests_active %}active{% endblock %}
+        {% block username_to_display %}{{ username }}{% endblock %}
         {% block content %}
 
+        <!--Title Div-->
         <div class="row">
             <div class="col-xs-12">
                 <h1 id="login_content" name="request_leave_title" align="center">APPROVE LEAVE</h1>
             </div>
         </div>
 
+        <!--Table Listing Leave Requests-->
         <div class="row">
             <div class="container panel panel-default col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1">
                 <div class="table-responsive">
@@ -40,6 +43,58 @@
             </div>
         </div>
 
+        <!--Post Leave Approval Modal-->
+        <div class="modal fade" id="postLeaveApprovalModal" tabindex="-1" role="dialog" aria-labelledby="postLeaveApprovalModal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalLabelPostApproval">Leave Approval</h4>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 id= "approvalText">
+                            Leave Request has been successfully approved.
+                        </h4>
+                    </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+            </div>
+          </div>
+        </div>
+
+        <!--Post Leave Decline Modal-->
+        <div class="modal fade" id="postLeaveDeclineModal" tabindex="-1" role="dialog" aria-labelledby="postLeaveDeclineModal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalLabelPostDecline">Leave Approval</h4>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 id= "declinedText">
+                            Leave Request has been successfully declined.
+                        </h4>
+                    </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+            </div>
+          </div>
+        </div>
+
 
 
 {% endblock %}
@@ -47,12 +102,14 @@
 {% block scripts %}
 <script>
     $(document).ready(function() {
-
         getLeaveRequests();
-
     });
 
+    // Get all leave requests for the currently logged in user
     function getLeaveRequests(){
+
+        var table_id = "leaveRequestTable"
+        var table_element = $("#" + table_id)
 
             $.ajax({
                 type: "GET",
@@ -61,53 +118,80 @@
                     $.loader.open();
                 },
                 success: function(data){
-                    $.each(data, function(i, event_detail){
-
-                        var start_date_test = "";
-                        var end_date_test = "";
-                        var all_day = "true";
-                        var start_date_month = "";
-                        var start_date_year = "";
-                        var start_date_day = "";
-                        var start_date_time;
-                        var leave_id = "";
-
-                        var name = event_detail["name"];
-                        var title = event_detail["title"];
-                        var start_date = event_detail["start_date"];
-                        var end_date = event_detail["end_date"];
-                        var start_time = event_detail["start_time"];
-                        var end_time = event_detail["end_time"];
-                        var reason = event_detail["reason"];
-                        var status = event_detail["status"];
-                        var leave_id = event_detail["leave_id"];
+                    if(data.length == 0){
 
                         var table = document.getElementById("leaveRequestTable");
 
-                        var row = table.insertRow(i+1);
+                        var row = table.insertRow(1);
 
                         var table_name = row.insertCell(0);
-                        var table_leave_type = row.insertCell(1);
-                        var table_start_date = row.insertCell(2);
-                        var table_start_time = row.insertCell(3);
-                        var table_end_date = row.insertCell(4);
-                        var table_end_time = row.insertCell(5);
-                        var table_reason = row.insertCell(6);
-                        var table_status = row.insertCell(7);
-                        var table_response = row.insertCell(8);
 
-                        table_name.innerHTML = name;
-                        table_leave_type.innerHTML = title;
-                        table_start_date.innerHTML = start_date;
-                        table_start_time.innerHTML = start_time;
-                        table_end_date.innerHTML = end_date;
-                        table_end_time.innerHTML = end_time;
-                        table_reason.innerHTML = reason;
-                        table_status.innerHTML = status;
+                        table_name.innerHTML = "You have no requests to approve";
 
-                        addFormElements(table_response, leave_id);
+                    }else{
 
-                    });
+                        $.each(data, function(i, event_detail){
+
+                            var leave_request_table_row = table_element.find("input" + "[" + "leave_id" + "=" + event_detail["leave_id"] + "]");
+
+                            if (leave_request_table_row.length < 1){
+
+                                var start_date_test = "";
+                                var end_date_test = "";
+                                var all_day = "true";
+                                var start_date_month = "";
+                                var start_date_year = "";
+                                var start_date_day = "";
+                                var start_date_time;
+                                var leave_id = "";
+
+                                var name = event_detail["name"];
+                                var title = event_detail["title"];
+                                var start_date = event_detail["start_date"];
+                                var end_date = event_detail["end_date"];
+                                var start_time = event_detail["start_time"];
+                                var end_time = event_detail["end_time"];
+                                var reason = event_detail["reason"];
+                                var status = event_detail["status"];
+                                var leave_id = event_detail["leave_id"];
+
+                                start_date = new Date(start_date)
+                                start_date = start_date.toString("dd/MM/yyyy");
+
+                                end_date = new Date(end_date)
+                                end_date = end_date.toString("dd/MM/yyyy");
+
+                                var table = document.getElementById("leaveRequestTable");
+
+                                var row = table.insertRow(i+1);
+
+                                var table_name = row.insertCell(0);
+                                var table_leave_type = row.insertCell(1);
+                                var table_start_date = row.insertCell(2);
+                                var table_start_time = row.insertCell(3);
+                                var table_end_date = row.insertCell(4);
+                                var table_end_time = row.insertCell(5);
+                                var table_reason = row.insertCell(6);
+                                var table_status = row.insertCell(7);
+                                var table_response = row.insertCell(8);
+
+                                table_name.innerHTML = name;
+                                table_leave_type.innerHTML = title;
+                                table_start_date.innerHTML = start_date;
+                                table_start_time.innerHTML = start_time;
+                                table_end_date.innerHTML = end_date;
+                                table_end_time.innerHTML = end_time;
+                                table_reason.innerHTML = reason;
+                                table_status.innerHTML = status;
+
+                                addFormElements(table_response, leave_id);
+
+                            }else{
+                                // leave request already exists
+                            }
+
+                        });
+                    }
                 },
                 complete : function(){
                     $.loader.close();
@@ -116,52 +200,110 @@
 
         }
 
+
+    // Render all leave events within the table, including Approve and Decline buttons
     function addFormElements(table_response, leave_id){
 
-                var approval_form = document.createElement("form");
-                approval_form.setAttribute('onsubmit',"return false;");
+        var approval_form = document.createElement("form");
+        approval_form.setAttribute('onsubmit',"return false;");
 
-                var approved_button = document.createElement("input");
+        var div_tag = document.createElement("div");
+        div_tag.setAttribute("class", "row");
 
-                approved_button.setAttribute('type',"button");
-                approved_button.setAttribute('id',("Approve" + leave_id));
-                approved_button.setAttribute('value',"Approve");
-                approved_button.setAttribute('class',"btn btn-success");
-                approved_button.setAttribute('name',"approved_button");
-                approved_button.setAttribute('leave_id',leave_id);
-                approved_button.setAttribute('onClick',"setApprovalStatus(this);");
+        var approved_button_column = document.createElement("div");
+        approved_button_column.setAttribute("class", "col-xs-6");
+        var declined_button_column = document.createElement("div");
+        declined_button_column.setAttribute("class", "col-xs-6");
 
+        var approved_button = document.createElement("input");
 
-                var declined_button = document.createElement("input");
+        approved_button.setAttribute('type',"button");
+        approved_button.setAttribute('id',("Approve" + leave_id));
+        approved_button.setAttribute('value',"Approve");
+        approved_button.setAttribute('class',"btn btn-success");
+        approved_button.setAttribute('name',"approved_button");
+        approved_button.setAttribute('leave_id',leave_id);
+        approved_button.setAttribute('onClick',"setApprovalStatus(this);");
 
-                declined_button.setAttribute('type',"button");
-                declined_button.setAttribute('id',("Decline" + leave_id));
-                declined_button.setAttribute('value',"Decline");
-                declined_button.setAttribute('class',"btn btn-danger");
-                declined_button.setAttribute('name',"declined_button");
-                declined_button.setAttribute('leave_id',leave_id);
-                declined_button.setAttribute('onClick',"setApprovalStatus(this);");
+        var declined_button = document.createElement("input");
 
-                var hidden_field = document.createElement("input"); //input element, text
-                hidden_field.setAttribute('type',"hidden");
-                hidden_field.setAttribute('name',"leave_id");
-                hidden_field.setAttribute('value',leave_id);
+        declined_button.setAttribute('type',"button");
+        declined_button.setAttribute('id',("Decline" + leave_id));
+        declined_button.setAttribute('value',"Decline");
+        declined_button.setAttribute('class',"btn btn-danger");
+        declined_button.setAttribute('name',"declined_button");
+        declined_button.setAttribute('leave_id',leave_id);
+        declined_button.setAttribute('onClick',"setApprovalStatus(this);");
 
-                approved_button.appendChild(hidden_field);
-                declined_button.appendChild(hidden_field);
+        var hidden_field = document.createElement("input"); //input element, text
+        hidden_field.setAttribute('type',"hidden");
+        hidden_field.setAttribute('name',"leave_id");
+        hidden_field.setAttribute('value',leave_id);
 
-                approval_form.appendChild(approved_button);
-                approval_form.appendChild(declined_button);
-                approval_form.appendChild(hidden_field);
+        approved_button.appendChild(hidden_field);
+        declined_button.appendChild(hidden_field);
 
-                table_response.appendChild(approval_form);
+        div_tag.appendChild(approved_button_column);
+        div_tag.appendChild(declined_button_column);
 
-            }
+        approved_button_column.appendChild(approved_button);
+        declined_button_column.appendChild(declined_button);
+        div_tag.appendChild(hidden_field);
 
+        approval_form.appendChild(div_tag)
+
+        table_response.appendChild(approval_form);
+
+    }
+
+    // Set Event to Approved or Declined
     function setApprovalStatus(calling_element){
+
+        var approved_name = "approved_button"
 
         var current_leave_id = document.getElementById(calling_element.id).getAttribute("leave_id");
         var current_name = document.getElementById(calling_element.id).getAttribute("name");
+
+        var nameOfUserForCurrentLeaveRequest = $(calling_element).closest('tr').children()[0].innerHTML;
+        var startDateForCurrentLeaveRequest = $(calling_element).closest('tr').children()[2].innerHTML;
+        var endDateForCurrentLeaveRequest = $(calling_element).closest('tr').children()[4].innerHTML;
+
+        if(current_name == approved_name){
+
+            document.getElementById("eventUserNameValueApprovedModal").innerHTML = nameOfUserForCurrentLeaveRequest;
+            document.getElementById("eventStartDateValueApprovedModal").innerHTML = startDateForCurrentLeaveRequest;
+            document.getElementById("eventEndDateValueApprovedModal").innerHTML = endDateForCurrentLeaveRequest;
+            document.getElementById("submitButtonConfirmApprovalModal").setAttribute('leave_id',current_leave_id);
+            document.getElementById("submitButtonConfirmApprovalModal").setAttribute('name',current_name);
+
+            $('#confirmApprovalModal').modal('show');
+
+        }else{
+
+            document.getElementById("eventUserNameValueDeclineModal").innerHTML = nameOfUserForCurrentLeaveRequest;
+            document.getElementById("eventStartDateValueDeclineModal").innerHTML = startDateForCurrentLeaveRequest;
+            document.getElementById("eventEndDateValueDeclineModal").innerHTML = endDateForCurrentLeaveRequest;
+            document.getElementById("submitButtonConfirmDeclineModal").setAttribute('leave_id',current_leave_id);
+            document.getElementById("submitButtonConfirmDeclineModal").setAttribute('name',current_name);
+
+            $('#confirmDeclineModal').modal('show');
+        }
+    }
+
+
+    // Set approval status to either Approved or Declined depending on the button that is pressed.
+    function setStatusOfLeave(calling_element){
+
+        var approved_name = "approved_button"
+
+        var current_leave_id = document.getElementById(calling_element.id).getAttribute("leave_id");
+        var current_name = document.getElementById(calling_element.id).getAttribute("name");
+
+        if(current_name == approved_name){
+            $('#confirmApprovalModal').modal('hide');
+        }else{
+            $('#confirmDeclineModal').modal('hide');
+        }
 
         $.ajax({
                 type: "POST",
@@ -173,14 +315,21 @@
                     $.loader.open();
                 },
                 success: function(data){
-                    $.loader.close();
-                    getLeaveRequests();
-
+                    if(current_name == approved_name){
+                        $('#postLeaveApprovalModal').modal('show');
+                    }else{
+                        $('#postLeaveDeclineModal').modal('show');
+                    }
                 },
                 failure: function(response, opts) {
                     console.log('server-side failure: ' + response);
                 },
-            });
+                complete : function(){
+                    $('#leaveRequestTable tr:gt(0)').remove()
+                    $.loader.close();
+                    getLeaveRequests();
+                }
+        });
     }
 
 </script>

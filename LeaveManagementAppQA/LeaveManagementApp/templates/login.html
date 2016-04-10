@@ -17,8 +17,12 @@
                             <h2 align="center">Login</h2>
                                 <form action="/account/auth/" method="post">{% csrf_token %}
                                     <div class="form-group">
-                                         <label for="username"> Username:</label>
-                                        <input type="text" class="form-control" placeholder="Username" name="username" value="" id="username">
+                                        <div class="input-prepend">
+                                            <label for="username"> Username:</label>
+                                            <input type="text" class="form-control" placeholder="Username" name="username" value="" id="username">
+                                        </div>
+
+                                        </input>
                                     </div>
                                    <div class="form-group">
                                        <label for="password"> Password:</label>
@@ -27,14 +31,15 @@
                                    <div class="col-md-12" style="height:1vh;">
                                     </div>
                                     <div class="form-group">
-                                        <input type="submit" value="LOGIN" class="btn btn-default form-control"/>
+                                            <input type="submit" value="LOGIN" class="btn btn-default form-control"/>
+                                            <input type="hidden" name="next" value="{{ next_parameter }}">
                                     </div>
                                 {% if form.errors %}
                                     <p class="error"> Sorry, thats not a valid username or password</p>
                                 {% endif %}
                                 </form>
                                 <a href="/password_reset">
-                                    I've forgotten my password
+                                    Forgotten password?
                                 </a>
                             </div>
                         </div>
